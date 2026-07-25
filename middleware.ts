@@ -23,6 +23,13 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(adminAccessUrl);
   }
 
+  if (
+    pathname.startsWith("/api/submissions") &&
+    request.cookies.get("agape-admin")?.value === "granted"
+  ) {
+    return NextResponse.next();
+  }
+
   if (request.cookies.get("agape-access")?.value === "granted") {
     return NextResponse.next();
   }
