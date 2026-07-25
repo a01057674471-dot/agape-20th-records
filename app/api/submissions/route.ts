@@ -3,13 +3,11 @@ import { getSupabaseAdmin, STORAGE_BUCKET } from "../../lib/supabaseAdmin";
 
 export async function GET(request: NextRequest) {
   try {
-    const requestedKind = request.nextUrl.searchParams.get("kind");
     const isAdmin = request.cookies.get("agape-admin")?.value === "granted";
-    const canViewMeetings =
-      requestedKind === "meeting" &&
-      request.cookies.get("agape-access")?.value === "granted";
+    const hasSiteAccess = request.cookies.get("agape-access")?.value === "granted";
+    const requestedKind = request.nextUrl.searchParams.get("kind");
 
-    if (!isAdmin && !canViewMeetings) {
+    if (!isAdmin && !hasSiteAccess) {
       return NextResponse.json({ message: "열람 권한이 없습니다." }, { status: 403 });
     }
 

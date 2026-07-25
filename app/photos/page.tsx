@@ -126,8 +126,24 @@ export default function PhotosPage() {
             <span className="completion-mark">✓</span>
             <p className="eyebrow dark">SUBMITTED</p>
             <h2>사진이 접수되었습니다</h2>
-            <p>사진 원본이 온라인 저장소에 안전하게 보관되었습니다.</p>
-            <button className="gold-button submit-single-button" onClick={reset} type="button">새 사진 올리기</button>
+            <p>아래에서 올린 사진을 미리 확인할 수 있습니다.</p>
+            <article className="submission-preview">
+              <span>사진 미리보기</span>
+              <h3>{title}</h3>
+              <p className="record-author">작성자 {name}</p>
+              <div className="photo-preview-grid">
+                {photos.map((photo, index) => (
+                  <div className="photo-preview" key={`${photo.file.name}-${index}`}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img alt={`올린 사진 ${index + 1}`} src={photo.url} />
+                  </div>
+                ))}
+              </div>
+            </article>
+            <div className="completion-actions">
+              <a className="btn btn-primary" href="/records">올라온 기록에서 보기</a>
+              <button onClick={reset} type="button">새 사진 올리기</button>
+            </div>
           </section>
         )}
       </main>

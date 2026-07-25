@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseAdmin, STORAGE_BUCKET } from "../../../lib/supabaseAdmin";
+import { createSubmissionToken } from "../../../lib/submissionToken";
 
 type FileInfo = { name?: string; type?: string; size?: number };
 const VALID_KINDS = ["manuscript", "photo", "meeting"] as const;
@@ -64,7 +65,11 @@ export async function POST(request: NextRequest) {
       });
     }
 
-    return NextResponse.json({ submissionId: submission.id, uploads });
+    return NextResponse.json({
+      submissionId: submission.id,
+      managementToken: await createSubmissionToken(submission.id),
+      uploads,
+    });
   } catch (error) {
     console.error("submission start failed", error);
     return NextResponse.json({ message: "온라인 접수를 시작하지 못했습니다." }, { status: 500 });

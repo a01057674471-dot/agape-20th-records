@@ -1,5 +1,6 @@
 import PageHeader from "./components/PageHeader";
 import SiteFooter from "./components/SiteFooter";
+import RecordsGallery from "./components/RecordsGallery";
 
 const tasks = [
   {
@@ -46,6 +47,7 @@ export default function Home() {
               다음 세대에게 전할 기념책을 만듭니다.
             </p>
             <div className="hero-cta">
+              <a className="btn btn-primary" href="/records">올라온 기록 보기</a>
               <a className="btn btn-primary" href="/manuscripts">원고 작성하기</a>
               <a className="btn btn-light" href="/photos">사진 올리기</a>
             </div>
@@ -72,6 +74,14 @@ export default function Home() {
               </a>
             ))}
           </div>
+        </section>
+
+        <section className="task-section home-records-section">
+          <div className="section-title">
+            <div><p>함께 만든 기록</p><h2>최근 올라온 자료</h2></div>
+            <span>원고와 사진을 바로 확인할 수 있습니다.</span>
+          </div>
+          <RecordsGallery compact />
         </section>
 
         <section className="dashboard-strip">

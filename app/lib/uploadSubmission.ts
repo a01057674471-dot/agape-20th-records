@@ -1,6 +1,7 @@
 "use client";
 
 import { createClient } from "@supabase/supabase-js";
+import { saveSubmissionToken } from "./mySubmissions";
 
 export type SubmissionKind = "manuscript" | "photo" | "meeting";
 
@@ -70,5 +71,9 @@ export async function uploadSubmission(input: SubmitInput) {
   const completeData = await completeResponse.json();
   if (!completeResponse.ok) throw new Error(completeData.message || "접수를 완료하지 못했습니다.");
 
-  return completeData;
+  saveSubmissionToken(startData.submissionId, startData.managementToken);
+  return {
+    ...completeData,
+    managementToken: startData.managementToken as string,
+  };
 }
