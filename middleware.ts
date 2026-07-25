@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_PATHS = ["/access", "/api/access"];
+const PUBLIC_PATHS = ["/access", "/api/access", "/admin-access", "/api/admin-access"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -9,7 +9,21 @@ export function middleware(request: NextRequest) {
     pathname.startsWith("/_next") ||
     pathname === "/favicon.ico";
 
-  if (isPublic || request.cookies.get("agape-access")?.value === "granted") {
+  if (isPublic) {
+    return NextResponse.next();
+  }
+
+  if (pathname.startsWith("/admin")) {
+    if (request.cookies.get("agape-admin")?.value === "granted") {
+      return NextResponse.next();
+    }
+
+    const adminAccessUrl = new URL("/admin-access", request.url);
+    adminAccessUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(adminAccessUrl);
+  }
+
+  if (request.cookies.get("agape-access")?.value === "granted") {
     return NextResponse.next();
   }
 
