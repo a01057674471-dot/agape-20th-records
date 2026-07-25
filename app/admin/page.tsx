@@ -1,73 +1,113 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import PageHeader from "../components/PageHeader";
 import SiteFooter from "../components/SiteFooter";
 
 type Status = "접수" | "검토 중" | "완료";
-type Notice = { id: number; title: string; category: string; createdAt: string };
-type Manuscript = {
-  id: number; category: string; title: string; author: string; phone: string;
-  content: string; fileName?: string; status: Status; submittedAt: string;
+type SubmissionFile = {
+  id: string;
+  original_name: string;
+  size_bytes: number;
+  downloadUrl: string | null;
 };
-type PhotoSubmission = {
-  id: number; event: string; year: string; name: string; phone: string;
-  description: string; fileNames: string[]; count: number; status: Status; submittedAt: string;
+type Submission = {
+  id: string;
+  kind: "manuscript" | "photo" | "meeting";
+  title: string;
+  name: string;
+  content: string | null;
+  status: Status;
+  created_at: string;
+  submission_files: SubmissionFile[];
 };
 
-const MANUSCRIPTS_KEY = "agape-manuscript-submissions";
-const PHOTOS_KEY = "agape-photo-submissions";
-const NOTICES_KEY = "agape-admin-notices";
-const initialNotices: Notice[] = [
-  { id: 1, title: "원고 접수 마감일은 2026년 8월 31일입니다.", category: "원고", createdAt: "2026.07.25" },
-  { id: 2, title: "1998~2005년의 오래된 사진을 우선 모집합니다.", category: "사진", createdAt: "2026.07.25" },
-];
+const KIND_LABELS = { manuscript: "원고", photo: "사진", meeting: "회의 자료" };
 
-function readList<T>(key: string): T[] {
-  try {
-    const stored = window.localStorage.getItem(key);
-    return stored ? JSON.parse(stored) as T[] : [];
-  } catch {
-    return [];
-  }
+function readableSize(bytes: number) {
+  if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))}KB`;
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
 }
 
 export default function AdminPage() {
-  const [notices, setNotices] = useState<Notice[]>(initialNotices);
-  const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
-  const [photos, setPhotos] = useState<PhotoSubmission[]>([]);
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("공지");
-  const [saved, setSaved] = useState("");
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedNotices = readList<Notice>(NOTICES_KEY);
-    if (storedNotices.length) setNotices(storedNotices);
-    setManuscripts(readList<Manuscript>(MANUSCRIPTS_KEY));
-    setPhotos(readList<PhotoSubmission>(PHOTOS_KEY));
+  const loadSubmissions = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/submissions", { cache: "no-store" });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message);
+      setSubmissions(data.submissions);
+      setMessage("");
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : "접수 목록을 불러오지 못했습니다.");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-  function saveNotices(next: Notice[]) {
-    setNotices(next);
-    window.localStorage.setItem(NOTICES_KEY, JSON.stringify(next));
+  useEffect(() => { loadSubmissions(); }, [loadSubmissions]);
+
+  async function changeStatus(item: Submission, status: Status) {
+    const response = await fetch(`/api/submissions/${item.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status }),
+    });
+    if (!response.ok) {
+      setMessage("상태를 변경하지 못했습니다.");
+      return;
+    }
+    setSubmissions((current) => current.map((entry) => entry.id === item.id ? { ...entry, status } : entry));
   }
 
-  function saveManuscripts(next: Manuscript[]) {
-    setManuscripts(next);
-    window.localStorage.setItem(MANUSCRIPTS_KEY, JSON.stringify(next));
+  async function deleteSubmission(item: Submission) {
+    if (!window.confirm(`“${item.title}” 자료를 완전히 삭제할까요?`)) return;
+    const response = await fetch(`/api/submissions/${item.id}`, { method: "DELETE" });
+    if (!response.ok) {
+      setMessage("자료를 삭제하지 못했습니다.");
+      return;
+    }
+    setSubmissions((current) => current.filter((entry) => entry.id !== item.id));
   }
 
-  function savePhotos(next: PhotoSubmission[]) {
-    setPhotos(next);
-    window.localStorage.setItem(PHOTOS_KEY, JSON.stringify(next));
-  }
-
-  function addNotice(event: FormEvent) {
-    event.preventDefault();
-    if (!title.trim()) return;
-    saveNotices([{ id: Date.now(), title: title.trim(), category, createdAt: new Date().toLocaleDateString("ko-KR") }, ...notices]);
-    setTitle("");
-    setSaved("공지사항을 이 기기에 저장했습니다.");
+  function renderSection(kind: Submission["kind"]) {
+    const items = submissions.filter((item) => item.kind === kind);
+    return (
+      <section className="admin-panel submission-panel" key={kind}>
+        <div className="panel-heading"><h2>{KIND_LABELS[kind]} 제출 목록</h2><span>{items.length}건</span></div>
+        {items.length === 0 ? <p className="empty-state">아직 제출된 자료가 없습니다.</p> : (
+          <div className="submission-list">
+            {items.map((item) => (
+              <article key={item.id}>
+                <div className="submission-main">
+                  <span className="submission-type">{KIND_LABELS[item.kind]}</span>
+                  <h3>{item.title}</h3>
+                  <p>{item.name} · {new Date(item.created_at).toLocaleString("ko-KR")}</p>
+                  {item.content && <details><summary>원고 내용 보기</summary><p>{item.content}</p></details>}
+                  {item.submission_files.length > 0 && (
+                    <div className="admin-file-links">
+                      {item.submission_files.map((file) => file.downloadUrl ? (
+                        <a href={file.downloadUrl} key={file.id}>{file.original_name} · {readableSize(file.size_bytes)}</a>
+                      ) : <span key={file.id}>{file.original_name}</span>)}
+                    </div>
+                  )}
+                </div>
+                <div className="submission-actions">
+                  <select aria-label={`${item.title} 상태`} onChange={(event) => changeStatus(item, event.target.value as Status)} value={item.status}>
+                    <option>접수</option><option>검토 중</option><option>완료</option>
+                  </select>
+                  <button onClick={() => deleteSubmission(item)} type="button">삭제</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    );
   }
 
   return (
@@ -75,98 +115,23 @@ export default function AdminPage() {
       <PageHeader active="home" />
       <main className="admin-dashboard">
         <section className="admin-heading">
-          <div><p className="kicker">EDITOR DASHBOARD</p><h1>관리자 페이지</h1><p>제출된 원고와 사진, 공지사항을 한곳에서 관리합니다.</p></div>
+          <div><p className="kicker">EDITOR DASHBOARD</p><h1>관리자 페이지</h1><p>모든 기기에서 제출된 원고와 사진, 회의 자료를 관리합니다.</p></div>
           <span>편집부 전용</span>
         </section>
-
+        {message && <p className="alert-message" role="status">{message}</p>}
         <section className="stat-grid">
-          <article><span>접수 원고</span><strong>{manuscripts.length}</strong><p>현재 기기 접수 내역</p></article>
-          <article><span>사진 제출</span><strong>{photos.length}</strong><p>현재 기기 접수 내역</p></article>
-          <article><span>검토할 자료</span><strong>{[...manuscripts, ...photos].filter((item) => item.status !== "완료").length}</strong><p>완료 전 자료</p></article>
-          <article><span>공지사항</span><strong>{notices.length}</strong><p>현재 기기에 저장됨</p></article>
+          <article><span>원고</span><strong>{submissions.filter((item) => item.kind === "manuscript").length}</strong><p>온라인 접수</p></article>
+          <article><span>사진</span><strong>{submissions.filter((item) => item.kind === "photo").length}</strong><p>온라인 접수</p></article>
+          <article><span>회의 자료</span><strong>{submissions.filter((item) => item.kind === "meeting").length}</strong><p>온라인 접수</p></article>
+          <article><span>검토할 자료</span><strong>{submissions.filter((item) => item.status !== "완료").length}</strong><p>완료 전 자료</p></article>
         </section>
-
-        <section className="admin-panel submission-panel">
-          <div className="panel-heading"><h2>원고 제출 목록</h2><span>{manuscripts.length}건</span></div>
-          {manuscripts.length === 0 ? <p className="empty-state">아직 제출된 원고가 없습니다.</p> : (
-            <div className="submission-list">
-              {manuscripts.map((item) => (
-                <article key={item.id}>
-                  <div className="submission-main">
-                    <span className="submission-type">{item.category}</span>
-                    <h3>{item.title}</h3>
-                    <p>{item.author} · {item.phone} · {item.submittedAt}</p>
-                    <details><summary>원고 내용 보기</summary><p>{item.content}</p>{item.fileName && <small>첨부: {item.fileName}</small>}</details>
-                  </div>
-                  <div className="submission-actions">
-                    <select aria-label={`${item.title} 상태`} value={item.status} onChange={(event) => saveManuscripts(manuscripts.map((entry) => entry.id === item.id ? { ...entry, status: event.target.value as Status } : entry))}>
-                      <option>접수</option><option>검토 중</option><option>완료</option>
-                    </select>
-                    <button onClick={() => saveManuscripts(manuscripts.filter((entry) => entry.id !== item.id))} type="button">삭제</button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </section>
-
-        <section className="admin-panel submission-panel">
-          <div className="panel-heading"><h2>사진 제출 목록</h2><span>{photos.length}건</span></div>
-          {photos.length === 0 ? <p className="empty-state">아직 제출된 사진 내역이 없습니다.</p> : (
-            <div className="submission-list">
-              {photos.map((item) => (
-                <article key={item.id}>
-                  <div className="submission-main">
-                    <span className="submission-type">{item.year}</span>
-                    <h3>{item.event}</h3>
-                    <p>{item.name} · {item.phone} · 사진 {item.count}장 · {item.submittedAt}</p>
-                    {item.description && <p className="submission-description">{item.description}</p>}
-                    <small>파일명: {item.fileNames.join(", ")}</small>
-                  </div>
-                  <div className="submission-actions">
-                    <select aria-label={`${item.event} 상태`} value={item.status} onChange={(event) => savePhotos(photos.map((entry) => entry.id === item.id ? { ...entry, status: event.target.value as Status } : entry))}>
-                      <option>접수</option><option>검토 중</option><option>완료</option>
-                    </select>
-                    <button onClick={() => savePhotos(photos.filter((entry) => entry.id !== item.id))} type="button">삭제</button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-          <p className="helper-note">현재 단계에서는 사진 정보와 파일명만 저장됩니다. 사진 원본 보관은 온라인 데이터베이스 연결 후 제공됩니다.</p>
-        </section>
-
-        <section className="admin-columns">
-          <div className="admin-panel">
-            <div className="panel-heading"><h2>공지사항 관리</h2><span>{notices.length}개</span></div>
-            <form className="notice-form" onSubmit={addNotice}>
-              <select onChange={(event) => setCategory(event.target.value)} value={category}>
-                <option>공지</option><option>원고</option><option>사진</option><option>회의</option>
-              </select>
-              <input onChange={(event) => setTitle(event.target.value)} placeholder="새 공지 내용을 입력하세요" value={title} />
-              <button type="submit">등록</button>
-            </form>
-            {saved && <p className="alert-message">{saved}</p>}
-            <div className="admin-notice-list">
-              {notices.map((notice) => (
-                <article key={notice.id}>
-                  <span>{notice.category}</span><div><strong>{notice.title}</strong><small>{notice.createdAt}</small></div>
-                  <button aria-label={`${notice.title} 삭제`} onClick={() => saveNotices(notices.filter((item) => item.id !== notice.id))} type="button">삭제</button>
-                </article>
-              ))}
-            </div>
-          </div>
-          <aside className="admin-panel">
-            <div className="panel-heading"><h2>저장 안내</h2></div>
-            <ul className="admin-checklist">
-              <li><span>완료</span>관리자 비밀번호 분리</li>
-              <li><span>완료</span>원고·사진 접수 목록</li>
-              <li><span>완료</span>접수 상태 변경·삭제</li>
-              <li className="waiting"><span>다음</span>온라인 데이터베이스 연결</li>
-            </ul>
-            <p className="helper-note">현재 접수 내역은 제출한 브라우저에만 저장됩니다. 모든 기기에서 함께 보려면 데이터베이스 연결이 필요합니다.</p>
-          </aside>
-        </section>
+        {loading ? <section className="admin-panel"><p className="empty-state">온라인 자료를 불러오는 중입니다.</p></section> : (
+          <>
+            {renderSection("manuscript")}
+            {renderSection("photo")}
+            {renderSection("meeting")}
+          </>
+        )}
       </main>
       <SiteFooter />
     </div>

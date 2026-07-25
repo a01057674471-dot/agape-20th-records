@@ -19,4 +19,10 @@ npm run dev
 
 `supabase/schema.sql`을 Supabase SQL Editor에서 실행합니다.
 
-현재 UI와 브라우저 임시저장까지 작동합니다. 실제 원고 제출, 사진 저장, 관리자 인증은 Supabase 연결 작업이 필요합니다.
+원고·사진·회의 자료는 Supabase Database와 비공개 Storage에 저장됩니다.
+
+- `NEXT_PUBLIC_SUPABASE_URL`: Supabase 프로젝트 URL
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`: 브라우저의 일회용 서명 업로드용 공개 키
+- `SUPABASE_SERVICE_ROLE_KEY`: 서버 전용 키. 브라우저 코드나 GitHub에 넣지 않습니다.
+
+일반 사용자는 제출만 가능하고 전체 자료 열람·상태 변경·삭제는 관리자 화면에서 처리합니다.
