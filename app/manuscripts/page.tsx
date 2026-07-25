@@ -5,6 +5,7 @@ import PageHeader from "../components/PageHeader";
 import SiteFooter from "../components/SiteFooter";
 
 const STORAGE_KEY = "agape-manuscript-draft";
+const SUBMISSIONS_KEY = "agape-manuscript-submissions";
 const THIRTY_DAYS = 30 * 24 * 60 * 60 * 1000;
 
 type ManuscriptDraft = {
@@ -79,6 +80,23 @@ export default function ManuscriptPage() {
   }
 
   function confirmSubmission() {
+    const submission = {
+      ...draft,
+      id: Date.now(),
+      fileName,
+      status: "접수",
+      submittedAt: new Date().toLocaleString("ko-KR"),
+    };
+    try {
+      const stored = window.localStorage.getItem(SUBMISSIONS_KEY);
+      const submissions = stored ? JSON.parse(stored) : [];
+      window.localStorage.setItem(
+        SUBMISSIONS_KEY,
+        JSON.stringify([submission, ...submissions]),
+      );
+    } catch {
+      window.localStorage.setItem(SUBMISSIONS_KEY, JSON.stringify([submission]));
+    }
     setStep("done");
     window.localStorage.removeItem(STORAGE_KEY);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -230,11 +248,11 @@ export default function ManuscriptPage() {
                 수정하기
               </button>
               <button className="gold-button" onClick={confirmSubmission} type="button">
-                제출 내용 확인
+                원고 제출하기
               </button>
             </div>
             <p className="save-note">
-              현재 단계에서는 제출 화면만 확인됩니다. 실제 접수는 데이터 연결 후 활성화됩니다.
+              제출하면 현재 기기의 관리자 목록에 안전하게 저장됩니다.
             </p>
           </section>
         )}
@@ -243,10 +261,10 @@ export default function ManuscriptPage() {
           <section className="form-card completion-card">
             <span className="completion-mark">✓</span>
             <p className="eyebrow dark">THANK YOU</p>
-            <h2>원고 내용을 확인했습니다</h2>
+            <h2>원고가 접수되었습니다</h2>
             <p>
-              실제 온라인 접수 기능은 데이터 연동 단계에서 활성화됩니다.
-              <br />작성 흐름과 화면은 지금부터 확인할 수 있습니다.
+              관리자 페이지에서 제출 내용을 확인할 수 있습니다.
+              <br />현재는 이 기기의 브라우저에 접수 내역이 저장됩니다.
             </p>
             <button className="gold-button" onClick={() => {
               setDraft(emptyDraft);
