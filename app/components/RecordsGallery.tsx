@@ -34,6 +34,7 @@ function readableSize(bytes: number) {
 
 export default function RecordsGallery({ compact = false }: { compact?: boolean }) {
   const [items, setItems] = useState<Submission[]>([]);
+  const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState<"all" | Submission["kind"]>("all");
@@ -48,6 +49,11 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       setItems(data.submissions);
+      setOwnedIds(new Set(
+        data.submissions
+          .filter((item: Submission) => Boolean(getSubmissionToken(item.id)))
+          .map((item: Submission) => item.id),
+      ));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "올라온 자료를 불러오지 못했습니다.");
     } finally {
@@ -107,6 +113,11 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
     }
     removeSubmissionToken(item.id);
     setItems((current) => current.filter((entry) => entry.id !== item.id));
+    setOwnedIds((current) => {
+      const next = new Set(current);
+      next.delete(item.id);
+      return next;
+    });
     setMessage("삭제되었습니다.");
   }
 
@@ -138,7 +149,7 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
 
       <div className="records-grid">
         {visibleItems.map((item) => {
-          const mine = Boolean(getSubmissionToken(item.id));
+          const mine = ownedIds.has(item.id);
           const imageFiles = item.submission_files.filter((file) => file.mime_type.startsWith("image/"));
           const pdfFiles = item.submission_files.filter((file) => file.mime_type === "application/pdf");
           return (
