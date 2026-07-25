@@ -10,6 +10,11 @@ const links = [
   { key: "progress", label: "진행 현황", href: "/progress" },
 ] as const;
 
+const mobileLinks = [
+  ...links,
+  { key: "admin", label: "관리자", href: "/admin" },
+] as const;
+
 export default function PageHeader({ active }: PageHeaderProps) {
   return (
     <>
@@ -35,7 +40,7 @@ export default function PageHeader({ active }: PageHeaderProps) {
         <a className="admin-link" href="/admin">관리자</a>
       </header>
       <nav className="mobile-nav" aria-label="모바일 주요 메뉴">
-        {links.map((link) => (
+        {mobileLinks.map((link) => (
           <a
             className={active === link.key ? "active" : undefined}
             href={link.href}
@@ -44,7 +49,8 @@ export default function PageHeader({ active }: PageHeaderProps) {
             {link.key === "manuscripts" ? "원고" :
               link.key === "photos" ? "사진" :
               link.key === "meetings" ? "자료" :
-              link.key === "progress" ? "현황" : "홈"}
+              link.key === "progress" ? "현황" :
+              link.key === "admin" ? "관리자" : "홈"}
           </a>
         ))}
       </nav>

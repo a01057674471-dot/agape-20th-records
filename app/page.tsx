@@ -18,6 +18,13 @@ const tasks = [
   },
   {
     number: "03",
+    title: "회의 자료",
+    description: "회의록과 편집 자료를 누구나 간편하게 올려 주세요.",
+    href: "/meetings",
+    action: "자료 올리기",
+  },
+  {
+    number: "04",
     title: "진행 확인",
     description: "기념책 제작이 어디까지 진행됐는지 확인하세요.",
     href: "/progress",
@@ -55,7 +62,7 @@ export default function Home() {
             <div><p>쉬운 자료 제출</p><h2>무엇을 하시겠어요?</h2></div>
             <span>원하는 항목을 누르면 바로 시작할 수 있습니다.</span>
           </div>
-          <div className="task-grid">
+          <div className="task-grid four-tasks">
             {tasks.map((task) => (
               <a className="task-card" href={task.href} key={task.number}>
                 <span className="task-number">{task.number}</span>
