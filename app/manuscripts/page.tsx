@@ -117,8 +117,18 @@ export default function ManuscriptPage() {
             <span className="completion-mark">✓</span>
             <p className="eyebrow dark">SUBMITTED</p>
             <h2>원고가 접수되었습니다</h2>
-            <p>관리자가 온라인 관리자 페이지에서 확인할 수 있습니다.</p>
-            <button className="gold-button submit-single-button" onClick={reset} type="button">새 원고 올리기</button>
+            <p>아래에서 올린 내용을 미리 확인할 수 있습니다.</p>
+            <article className="submission-preview">
+              <span>원고 미리보기</span>
+              <h3>{title}</h3>
+              <p className="record-author">작성자 {name}</p>
+              {content && <p className="record-content">{content}</p>}
+              {file && <p className="selected-file">첨부 파일: <strong>{file.name}</strong></p>}
+            </article>
+            <div className="completion-actions">
+              <a className="btn btn-primary" href="/records">올라온 기록에서 보기</a>
+              <button onClick={reset} type="button">새 원고 올리기</button>
+            </div>
           </section>
         )}
       </main>

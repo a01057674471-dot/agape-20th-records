@@ -130,6 +130,9 @@ export default function MeetingsPage() {
           </label>
           {selectedFile && <p className="selected-file">선택한 파일: <strong>{selectedFile.name}</strong> · {readableSize(selectedFile.size)}</p>}
           {message && <p className="alert-message" role="status">{message}</p>}
+          {message === "회의 자료가 등록되었습니다." && (
+            <a className="download-button inline-record-link" href="/records">올라온 기록에서 미리보기</a>
+          )}
           <button className="btn btn-primary wide-button" disabled={submitting} type="submit">
             {submitting ? "자료 전송 중..." : "회의 자료 등록하기"}
           </button>

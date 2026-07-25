@@ -1,9 +1,10 @@
 type PageHeaderProps = {
-  active: "home" | "manuscripts" | "photos" | "meetings" | "progress";
+  active: "home" | "records" | "manuscripts" | "photos" | "meetings" | "progress";
 };
 
 const links = [
   { key: "home", label: "홈", href: "/" },
+  { key: "records", label: "올라온 기록", href: "/records" },
   { key: "manuscripts", label: "원고 작성", href: "/manuscripts" },
   { key: "photos", label: "사진 업로드", href: "/photos" },
   { key: "meetings", label: "회의 자료", href: "/meetings" },
@@ -11,7 +12,7 @@ const links = [
 ] as const;
 
 const mobileLinks = [
-  ...links,
+  ...links.filter((link) => link.key !== "progress"),
   { key: "admin", label: "관리자", href: "/admin" },
 ] as const;
 
@@ -47,9 +48,9 @@ export default function PageHeader({ active }: PageHeaderProps) {
             key={link.key}
           >
             {link.key === "manuscripts" ? "원고" :
+              link.key === "records" ? "기록" :
               link.key === "photos" ? "사진" :
               link.key === "meetings" ? "자료" :
-              link.key === "progress" ? "현황" :
               link.key === "admin" ? "관리자" : "홈"}
           </a>
         ))}
