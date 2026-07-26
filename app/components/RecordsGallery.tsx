@@ -34,7 +34,6 @@ function readableSize(bytes: number) {
 
 export default function RecordsGallery({ compact = false }: { compact?: boolean }) {
   const [items, setItems] = useState<Submission[]>([]);
-  const [ownedIds, setOwnedIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [filter, setFilter] = useState<"all" | Submission["kind"]>("all");
@@ -49,11 +48,6 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
       const data = await response.json();
       if (!response.ok) throw new Error(data.message);
       setItems(data.submissions);
-      setOwnedIds(new Set(
-        data.submissions
-          .filter((item: Submission) => Boolean(getSubmissionToken(item.id)))
-          .map((item: Submission) => item.id),
-      ));
     } catch (error) {
       setMessage(error instanceof Error ? error.message : "올라온 자료를 불러오지 못했습니다.");
     } finally {
@@ -79,10 +73,12 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
   async function saveEdit(event: FormEvent, item: Submission) {
     event.preventDefault();
     const token = getSubmissionToken(item.id);
-    if (!token) return;
     const response = await fetch(`/api/submissions/${item.id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json", "x-submission-token": token },
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { "x-submission-token": token } : {}),
+      },
       body: JSON.stringify({
         title: editTitle,
         name: editName,
@@ -101,10 +97,10 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
 
   async function deleteItem(item: Submission) {
     const token = getSubmissionToken(item.id);
-    if (!token || !window.confirm(`“${item.title}” 자료를 삭제할까요?`)) return;
+    if (!window.confirm(`“${item.title}” 자료를 삭제할까요?\n삭제한 자료는 되돌릴 수 없습니다.`)) return;
     const response = await fetch(`/api/submissions/${item.id}`, {
       method: "DELETE",
-      headers: { "x-submission-token": token },
+      headers: token ? { "x-submission-token": token } : {},
     });
     const data = await response.json();
     if (!response.ok) {
@@ -113,11 +109,6 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
     }
     removeSubmissionToken(item.id);
     setItems((current) => current.filter((entry) => entry.id !== item.id));
-    setOwnedIds((current) => {
-      const next = new Set(current);
-      next.delete(item.id);
-      return next;
-    });
     setMessage("삭제되었습니다.");
   }
 
@@ -149,7 +140,6 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
 
       <div className="records-grid">
         {visibleItems.map((item) => {
-          const mine = ownedIds.has(item.id);
           const imageFiles = item.submission_files.filter((file) => file.mime_type.startsWith("image/"));
           const pdfFiles = item.submission_files.filter((file) => file.mime_type === "application/pdf");
           return (
@@ -181,7 +171,7 @@ export default function RecordsGallery({ compact = false }: { compact?: boolean 
                   ))}
                 </div>
               )}
-              {mine && !compact && (
+              {!compact && (
                 <div className="author-actions">
                   <button onClick={() => beginEdit(item)} type="button">수정</button>
                   <button className="danger" onClick={() => deleteItem(item)} type="button">삭제</button>

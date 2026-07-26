@@ -6,6 +6,10 @@ function isAdmin(request: NextRequest) {
   return request.cookies.get("agape-admin")?.value === "granted";
 }
 
+function hasSiteAccess(request: NextRequest) {
+  return request.cookies.get("agape-access")?.value === "granted";
+}
+
 export async function PATCH(
   request: NextRequest,
   context: { params: Promise<{ id: string }> },
@@ -13,7 +17,7 @@ export async function PATCH(
   const { id } = await context.params;
   const admin = isAdmin(request);
   const author = await verifySubmissionToken(id, request.headers.get("x-submission-token"));
-  if (!admin && !author) {
+  if (!admin && !author && !hasSiteAccess(request)) {
     return NextResponse.json({ message: "이 자료를 수정할 권한이 없습니다." }, { status: 403 });
   }
   const body = await request.json() as {
@@ -53,7 +57,7 @@ export async function DELETE(
   const { id } = await context.params;
   const admin = isAdmin(request);
   const author = await verifySubmissionToken(id, request.headers.get("x-submission-token"));
-  if (!admin && !author) {
+  if (!admin && !author && !hasSiteAccess(request)) {
     return NextResponse.json({ message: "이 자료를 삭제할 권한이 없습니다." }, { status: 403 });
   }
   const supabase = getSupabaseAdmin();
