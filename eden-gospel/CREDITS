@@ -1,0 +1,16 @@
+동산의 동편 (East of the Garden) — a short film in the Urban Sketch · Pen & Wash style
+
+Picture: every line, wash, figure and letter is drawn by code in this folder (engine.js, world.js, film.js, poses.js).
+  engine.js and poses.js are adapted from the Lemo-Opuscar library's urban-sketch demo (MIT licence).
+  No generated or third-party images.
+
+Scripture: 개역한글판 성경 (Korean Revised Version, 1961), public domain.
+  Quoted: 창세기 3:6, 3:9, 3:15, 3:21, 3:24; 요한복음 14:6. Other lines are paraphrase.
+
+Music & sound: original composition (audio/score.py) and procedural foley and ambience (audio/sound.py).
+Instrument samples (CC0 1.0): Versilian Studios — VS Chamber Orchestra: Community Edition & Versilian Community Sample Library (Sam Gossner).
+  https://github.com/sgossner/VSCO-2-CE · https://github.com/sgossner/VCSL
+Nylon guitar: physical modelling (pluck.py), no samples.
+
+Font (SIL Open Font License 1.1, files + licence in fonts/):
+  Nanum Pen Script — NHN Corporation (fonts/OFL-NanumPenScript.txt), subset to the characters used, via Google Fonts.
