@@ -66,6 +66,24 @@ if have:
     mix = voice + music + foley
 else:
     mix = score * .55 + fol * (rms(score) * .55 / rms(fol)) * .6
-mix = np.stack([limit(mix[:, c], .95) for c in range(2)], 1)
+# master to about -14 LUFS here, with a -2 dB ceiling, so mux.sh's loudnorm has almost nothing left to add
+# (the marker ticks and glockenspiel are sharp transients: left to loudnorm, its gain pushes them over -1.2 dBTP)
+import subprocess, tempfile, re
+def lufs(x):
+    with tempfile.NamedTemporaryFile(suffix='.wav') as f:
+        sf.write(f.name, x.astype(np.float32), SR)
+        out = subprocess.run(['ffmpeg', '-nostats', '-i', f.name, '-af', 'ebur128', '-f', 'null', '-'], capture_output=True, text=True).stderr
+    return float(re.findall(r'I:\s+(-?[\d.]+) LUFS', out)[-1])
+from scipy.signal import butter, sosfiltfilt
+mix = sosfiltfilt(butter(8, 15000, 'low', fs=SR, output='sos'), mix, axis=0)   # band-limit first: AAC drops the top octave, and on sharp ticks that turns into overshoot
+for _ in range(3):
+    mix = mix * 10 ** ((-14 - lufs(mix)) / 20)
+    up = soxr.resample(mix, SR, SR * 4)                      # limit oversampled: the ticks' inter-sample peaks are what overshoot
+    up = np.stack([limit(up[:, c], .7) for c in range(2)], 1)
+    mix = soxr.resample(up, SR * 4, SR)[:len(mix)]
+print('mastered to', lufs(mix), 'LUFS')
+# 6 s of trailing silence: mux.sh's decode check runs ~2.9 s behind on loudnorm and would reject a film this short;
+# mux trims the audio to the picture, so the padding never reaches the film
+mix = np.concatenate([mix, np.zeros((6 * SR, 2))])
 sf.write(os.path.join(OUT, 'mix.wav'), mix.astype(np.float32), SR)
 print('mix.wav', DUR, 's; voice lines:', have, '; peak', round(float(np.abs(mix).max()), 3))
