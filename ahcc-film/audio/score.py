@@ -1,6 +1,6 @@
 # AHCC whiteboard — clockwork-minimal score that follows the narration lines (audio/cues.json)
-# marimba ostinato + pizzicato bass + glockenspiel pings on the numbers; a full stop into silence before "하지만";
-# A minor for the caveats; back to C major for the conclusion. CC0 samples (VSCO 2 CE, VCSL).
+# marimba ostinato + pizzicato bass + glockenspiel pings on the key facts; a full stop into silence before "not a medicine";
+# A minor for the cautions; back to C major for the checklist and the end. CC0 samples (VSCO 2 CE, VCSL).
 # run: LIB=<library> $LIB/.venv/bin/python audio/score.py
 import os, sys, json
 LIB = os.environ['LIB']; sys.path.insert(0, LIB)
@@ -33,23 +33,24 @@ def ostinato(t0, t1, prog, bass, vel=.34, layer=0):
 
 # intro and explanation (v01–v05): C major, grows by one layer as the mechanism unfolds
 ostinato(.3, V['v03']['t0'], PROG_MAJ, BASS_MAJ, .3, 0)
-ostinato(V['v03']['t0'], V['v06']['t0'], PROG_MAJ, BASS_MAJ, .32, 1)
-ostinato(V['v06']['t0'], V['v07']['t1'] + .1, PROG_MAJ, BASS_MAJ, .34, 2)
+ostinato(V['v03']['t0'], V['v04']['t0'], PROG_MAJ, BASS_MAJ, .32, 1)
+ostinato(V['v04']['t0'], V['v05']['t1'] + .1, PROG_MAJ, BASS_MAJ, .34, 2)
 # pings on the numbers
-ev += [(at('v01', .55), 'glockenspiel', 'E6', 1.2, .35, .3), (at('v04', .55), 'glockenspiel', 'G6', 1.2, .4, .3), (at('v07', .78), 'glockenspiel', 'C7', 1.4, .42, .3), (at('v07', .8), 'glockenspiel', 'G6', 1.4, .3, -.2)]
-ev += [(at('v02', .02), 'xylophone', 'C6', .4, .35, .4)]                  # the magnet drops
-# a full stop into silence, then the caveats in A minor, sparse
-t8 = V['v08']['t0']
-ev += [(t8, 'contrabass_pizz', 'A1', 1.4, .5, 0), (t8, 'cellos', 'A2', V['v09']['t1'] - t8, .18, 0)]
-k = 0; t = t8 + BEAT
-while t < V['v09']['t1']:
+ev += [(at('v01', .3), 'glockenspiel', 'E6', 1.2, .35, .3), (at('v02', .76), 'glockenspiel', 'G6', 1.2, .35, .3), (at('v04', .78), 'glockenspiel', 'C7', 1.4, .42, .3), (at('v05', .84), 'glockenspiel', 'G6', 1.4, .34, -.2)]
+ev += [(at('v03', .12), 'xylophone', 'C6', .4, .35, .4)]                  # the magnet drops
+# a full stop into silence, then sparse A minor for "not a medicine" and "not the same ingredient"
+t6 = V['v06']['t0']
+ev += [(t6, 'contrabass_pizz', 'A1', 1.4, .5, 0), (t6, 'cellos', 'A2', V['v07']['t1'] - t6, .16, 0)]
+k = 0; t = t6 + BEAT
+while t < V['v07']['t1']:
     bar = (k // 4) % 4; ev.append((t, 'marimba', PROG_MIN[bar][k % 4], BEAT * 1.2, .26, -.2)); t += BEAT; k += 1
-# conclusion: C major returns; a chord on the double circle, a last chord at the end
-t10 = V['v10']['t0']
-ostinato(t10, V['v10']['t1'] + 1.0, PROG_MAJ, BASS_MAJ, .3, 1)
-tc = at('v10', .6)
+ev += [(at('v06', .84), 'glockenspiel', 'E6', 1.2, .32, .3)]
+# the checklist: C major returns, one ping per tick; then the double circle and a last chord
+ostinato(V['v08']['t0'], V['v09']['t1'] + 1.0, PROG_MAJ, BASS_MAJ, .3, 1)
+for i in range(3): ev.append((at('v08', .45 + i * .23), 'glockenspiel', ['C6', 'E6', 'G6'][i], 1.0, .34, .3))
+tc = at('v09', .84)
 ev += [dict(t=tc, inst='vibraphone', pitch=p, dur=2.4, vel=.3, pan=.2) for p in ['C4', 'E4', 'G4', 'C5']]
-te = V['v10']['t1'] + 1.0
+te = V['v09']['t1'] + 1.0
 ev += [dict(t=te, inst=i, pitch=p, dur=DUR - te, vel=v, pan=pn) for i, p, v, pn in [('vibraphone', 'C4', .3, .2), ('vibraphone', 'G4', .28, .2), ('vibraphone', 'E5', .26, .2), ('marimba', 'C3', .4, -.2), ('contrabass_pizz', 'C2', .45, 0), ('glockenspiel', 'C7', .35, .3)]]
 
 mix = S.render(ev, dur=DUR, master=False)
