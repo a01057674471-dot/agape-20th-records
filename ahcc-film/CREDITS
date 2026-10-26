@@ -1,0 +1,19 @@
+AHCC, 버섯 뿌리에서 온 연구 소재 — a whiteboard explainer (정보 제공용)
+
+Facts: see FACTS.md (every claim with its source). Main sources: Smith et al., Frontiers in Oncology 2022 (NCT02405533);
+  Shin et al., Journal of Immunology Research 2019; Memorial Sloan Kettering Cancer Center, About Herbs: AHCC.
+'AHCC' and 'Amino Up' are names of Amino Up Co., Ltd., used here only to identify the subject; no logos or packaging are shown.
+
+Picture: every line and letter is drawn by code in this folder (engine/wb.js, engine/hangul.js, film.js).
+  engine/wb.js is adapted from the Lemo-Opuscar library's whiteboard demo (MIT licence).
+  Korean board lettering: single-line strokes traced from Noto Sans KR glyphs (engine/hangul.js).
+
+Fonts (SIL Open Font License 1.1; licence files in fonts/):
+  EMS Tech — single-line font by Sheldon B. Michaels (via the npm package "hersheytext", MIT)
+  Noto Sans KR (Medium, subset) — Google / Adobe (fonts/OFL-NotoSansKR.txt)
+  Gaegu (Bold, subset) — The Gaegu Project Authors (fonts/OFL-Gaegu.txt)
+
+Music & sound: original composition (audio/score.py) and procedural marker foley (audio/sound.py).
+Instrument samples (CC0 1.0): Versilian Studios — VS Chamber Orchestra: Community Edition & Versilian Community Sample Library (Sam Gossner).
+
+Voice (when present): Microsoft Edge neural text-to-speech (ko-KR-SunHiNeural) via edge-tts. Check Microsoft's terms before commercial use.
