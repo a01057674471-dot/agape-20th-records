@@ -87,8 +87,8 @@ for _ in range(3):
     up = np.stack([limit(up[:, c], .7) for c in range(2)], 1)
     mix = soxr.resample(up, SR * 4, SR)[:len(mix)]
 print('mastered to', lufs(mix), 'LUFS')
-# 6 s of trailing silence: mux.sh's decode check runs ~2.9 s behind on loudnorm and would reject a film this short;
+# 14 s of trailing silence: mux.sh's decode check runs ~2.9 s behind on loudnorm and would reject a film this short;
 # mux trims the audio to the picture, so the padding never reaches the film
-mix = np.concatenate([mix, np.zeros((6 * SR, 2))])
+mix = np.concatenate([mix, np.zeros((14 * SR, 2))])
 sf.write(os.path.join(OUT, 'mix.wav'), mix.astype(np.float32), SR)
 print('mix.wav', DUR, 's; voice lines:', have, '; peak', round(float(np.abs(mix).max()), 3))
