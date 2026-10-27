@@ -1,0 +1,16 @@
+올리고파 (RAPHAHEAL) — 38 s portrait product film, Dark Tech Keynote style
+
+Copy and figures: see FACTS.md (each on-screen line with its source on the product detail page supplied by the client).
+'올리고파', 'RAPHAHEAL' and the package photo belong to the brand owner; Oligonol® is a registered trademark of its owner.
+  Package photo: cropped from the client's detail-page image (assets/package.jpg).
+
+Picture: drawn by code in this folder (engine.js, film.js). engine.js is adapted from the Lemo-Opuscar library's
+  Dark Tech Keynote demo (MIT licence).
+
+Fonts (SIL Open Font License 1.1; licence files in fonts/):
+  Noto Sans KR (Medium, ExtraBold, subset) — Google / Adobe
+  Inter Tight (SemiBold) — The Inter Tight Project Authors
+  JetBrains Mono (Medium) — The JetBrains Mono Project Authors
+
+Music & sound: original composition (audio/score.py) and procedural foley (audio/sound.py).
+Instrument samples (CC0 1.0): Versilian Studios — VS Chamber Orchestra: Community Edition & Versilian Community Sample Library (Sam Gossner).
