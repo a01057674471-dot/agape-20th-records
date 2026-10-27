@@ -1,11 +1,12 @@
-// Korean single-line strokes for the whiteboard: there is no single-stroke Hangul font, so each glyph is
+// Korean lettering for the whiteboard: there is no single-stroke Hangul font, so each glyph is
 // rendered from a bold sans font, thinned to a 1-px skeleton (Zhang–Suen), traced into polylines,
 // split at junctions and re-joined where a line runs straight through, then ordered roughly as a hand
 // writes Hangul (top-left first; horizontals left→right, verticals top→bottom).
-// Output goes into HANGUL in wb.js in the same units as the EMS font (y up, cap height ≈ 677).
+// Output goes into HANGUL in wb.js in the same units as the EMS font (y up, cap height ≈ 677). The strokes only set the
+// writing order and pace: wb.js reveals the real glyph through them, so every letter ends up whole and legible.
 import { HANGUL } from './wb.js';
 
-const F = 150, PAD = 18, N = F + PAD * 2, UNIT = 740 / F;   // px → font units
+const F = 150, PAD = 18, N = F + PAD * 2, UNIT = 850 / F;   // px → font units (Gaegu's Hangul sits small in its em box: scaled up to match the Latin cap height)
 
 function thin(img, w, h) {                       // Zhang–Suen thinning, in place on a 0/1 array
   const at = (x, y) => (x < 0 || y < 0 || x >= w || y >= h) ? 0 : img[y * w + x];
@@ -104,7 +105,7 @@ function orient(p) {
 }
 
 let cv;
-export async function loadHangul(chars, family = '"Noto Sans KR"', weight = 500) {
+export async function loadHangul(chars, family = '"Gaegu"', weight = 700) {
   await document.fonts.load(`${weight} ${F}px ${family}`, chars);
   cv = cv || new OffscreenCanvas(N, N); const g = cv.getContext('2d', { willReadFrequently: true });
   for (const ch of new Set(chars)) {
@@ -119,6 +120,7 @@ export async function loadHangul(chars, family = '"Noto Sans KR"', weight = 500)
     let P = cleanup(trace(img, N, N)).map(smooth).map(orient);
     P.sort((p, q) => { const c = s => { let x = 0, y = 0; for (const t of s) { x += t[0]; y += t[1]; } return [x / s.length, y / s.length]; }; const [ax, ay] = c(p), [bx, by] = c(q); return (ax + ay * 1.25) - (bx + by * 1.25); });
     // to font units: x from the glyph's left edge, y up from the baseline
-    HANGUL[ch] = { w: (adv + F * .06) * UNIT, s: P.map(p => p.flatMap(([x, y]) => [(x - PAD) * UNIT, (base - y) * UNIT * .92])) };
+    // fill: how to draw the real glyph in the same font units, so the pen can reveal its exact shape (wb.js)
+    HANGUL[ch] = { w: adv * .9 * UNIT, s: P.map(p => p.flatMap(([x, y]) => [(x - PAD) * UNIT, (base - y) * UNIT * .92])), fill: { font: `${weight} ${F}px ${family}`, PAD, base, UNIT, sy: .92 } };
   }
 }

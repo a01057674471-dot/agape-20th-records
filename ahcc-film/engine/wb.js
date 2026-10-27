@@ -204,12 +204,13 @@ export function text(str, x, y, o = {}) {
   let adv = 0; const glyphs = [];
   for (const ch of str) {
     const g = EXTRA[ch] || HANGUL[ch] || G[ch] || G['?'];
-    glyphs.push({ g, x: adv }); adv += g.w * k * sp;
+    glyphs.push({ g, x: adv, ch }); adv += g.w * k * sp;
   }
   const x0 = o.align === 'center' ? x - adv / 2 : o.align === 'right' ? x - adv : x;
   const out = [];
-  for (const { g, x: gx } of glyphs) {
+  for (const { g, x: gx, ch } of glyphs) {
     const rot = (R() - .5) * .07, dy = (R() - .5) * h * .07, sc = 1 + (R() - .5) * .06, cx = x0 + gx + g.w * k / 2;
+    const G = g.fill ? { g, ch, cx, y: y + dy, rot, k: k * sc, strokes: [], frame: -1 } : null;
     for (const s of g.s) {
       const p = [];
       for (let i = 0; i < s.length; i += 2) {
@@ -218,7 +219,9 @@ export function text(str, x, y, o = {}) {
         p.push(cx + px * Math.cos(rot) - py * Math.sin(rot), y + dy + px * Math.sin(rot) + py * Math.cos(rot));
       }
       if (p.length === 2) p.push(p[0] + 1, p[1] + 1);
-      out.push(new Stroke(p, { w: o.w ?? Math.max(5, h * .13), color: o.color, jitter: o.jitter ?? .35, wav: 90, kind: 'text', smooth: 1, alpha: o.alpha }));
+      const st = new Stroke(p, { w: o.w ?? Math.max(5, h * .13), color: o.color, jitter: o.jitter ?? .35, wav: 90, kind: 'text', smooth: 1, alpha: o.alpha });
+      if (G) { st.glyph = G; G.strokes.push(st); }
+      out.push(st);
     }
   }
   out.width = adv; out.x0 = x0;
@@ -379,9 +382,11 @@ export class Board {
         const q = e.path.at(L); ig.lineTo(q[0], q[1]); ig.stroke(); ig.restore();
       }
     };
+    this.frameId = (this.frameId || 0) + 1;
     for (const s of this.tl.strokes) {
       if (s.t0 >= t) continue;
       if (s.epoch > ep) flushErasers(s.epoch);
+      if (s.glyph) { if (s.glyph.frame !== this.frameId) { s.glyph.frame = this.frameId; drawGlyph(ig, s.glyph, t); } continue; }
       const b = s.box; if (b[2] < vx0 || b[0] > vx1 || b[3] < vy0 || b[1] > vy1) continue;
       if (s.hide && s.hide(t)) continue;
       const L = s.prog(t) * s.len;
@@ -423,6 +428,23 @@ export class Board {
     ctx.fillStyle = tg; ctx.beginPath(); ctx.roundRect(W * .08, H + f - 20, W * .84, 130, 18); ctx.fill();
     ctx.restore();
   }
+}
+
+// a Hangul glyph revealed by its pen: the real letter, clipped to wide ribbons along the strokes drawn so far
+function drawGlyph(ig, G, t) {
+  const S = G.strokes, done = S.every(s => t >= s.t1), f = G.g.fill, s0 = S[0];
+  ig.save();
+  if (!done) {
+    ig.beginPath();
+    for (const s of S) { const L = s.prog(t) * s.len; if (L > 0) ribbon(ig, s, L, 3.4); }
+    ig.clip();
+  }
+  ig.globalAlpha = s0.alpha; ig.fillStyle = s0.color || INK.black;
+  ig.translate(G.cx, G.y); ig.rotate(G.rot);
+  ig.scale(f.UNIT * G.k, f.UNIT * f.sy * G.k);
+  ig.translate(-f.PAD - G.g.w / (2 * f.UNIT), -f.base);
+  ig.font = f.font; ig.textBaseline = 'alphabetic'; ig.fillText(G.ch, f.PAD, f.base);
+  ig.restore();
 }
 
 // ───────────────────────── physical objects

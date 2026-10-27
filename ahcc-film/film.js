@@ -7,16 +7,19 @@ const SW = innerWidth, SH = innerHeight;
 W.setScreen(SW, SH);
 const LINES = await (await fetch('lines.json')).json();
 let DURS = {}; try { const r = await fetch('voices/dur.json'); if (r.ok) DURS = await r.json(); } catch (e) { }
+let TIMES = null; try { const r = await fetch('voices/times.json'); if (r.ok) TIMES = await r.json(); } catch (e) { }   // one recording for the whole script: line times inside it
 await W.loadFont('tech', 'fonts/EMSTech.json');
-await document.fonts.load('700 52px Gaegu');
+await document.fonts.load('700 52px Gaegu');   // subtitles and the board's Korean lettering
 
 // ---------- timing: one narration line after another ----------
 const GAP = .35, LEAD = .7;
 let t = LEAD;
 for (const L of LINES) {
+  if (TIMES) { const [a, b] = TIMES[L.id]; L.t0 = +(LEAD + a).toFixed(3); L.t1 = +(LEAD + b).toFixed(3); L.d = +(b - a).toFixed(3); continue; }
   if (L.id === 'v06') t += .8;                    // a beat of silence before the turn: "not a medicine"
   L.d = DURS[L.id] ?? L.est; L.t0 = +t.toFixed(3); L.t1 = +(t + L.d).toFixed(3); t = L.t1 + GAP;
 }
+window.VOICE_AT = TIMES ? LEAD : null;            // where the single recording starts in the film
 const V = Object.fromEntries(LINES.map(L => [L.id, L]));
 const at = (id, u) => V[id].t0 + V[id].d * u;     // a moment inside line id (u = 0..1)
 const DUR = +(V.v09.t1 + 3.6).toFixed(2);
@@ -118,7 +121,7 @@ tl.draw(K, ko('후기', 450, fY, 84), at('v09', .0), { by: at('v09', .12) });
 tl.draw(O, [W.line(760, fY - 70, 640, fY - 30, { w: 11 }), W.line(640, fY - 30, 760, fY + 10, { w: 11 })], at('v09', .12), { by: at('v09', .2) });   // 후기 < 공식 정보
 tl.draw(K, ko('공식 정보', 1010, fY, 84), at('v09', .2), { by: at('v09', .4) });
 tl.draw(K, [...W.text('AHCC', C, fY + 240, { h: 120, w: 11, align: 'center' }), ...ko('제대로 알고 선택', C, fY + 380, 82)], at('v09', .42), { by: at('v09', .82) });
-tl.draw(O, [W.circle(C, fY + 310, 430, { w: 9, ry: 170, lap: .3 }), W.circle(C, fY + 312, 445, { w: 7, ry: 182, lap: .2, a0: -1.4 })], at('v09', .82), { by: at('v09', 1.0) });
+tl.draw(O, [W.circle(C, fY + 305, 440, { w: 9, ry: 225, lap: .3 }), W.circle(C, fY + 307, 455, { w: 7, ry: 238, lap: .2, a0: -1.4 })], at('v09', .82), { by: at('v09', 1.0) });
 tl.draw(K, [...ko('정보 제공용 영상', C, fY + 640, 40), ...ko('출처: 식약처 개별인정 원료 정보 · FACTS.md', C, fY + 700, 32)], V.v09.t1 + .2, { by: V.v09.t1 + 1.3 });
 tl.cue(V.v09.t1 + 1.7, 'cap');
 tl.end();
@@ -139,7 +142,7 @@ const cam = new W.Camera([
 ]);
 
 // ---------- board, props, subtitles ----------
-const board = new W.Board(tl, { W: 1500, H: 8600 });
+const board = new W.Board(tl, { W: 1500, H: 9000 });
 board.objs.push({ draw: (ctx, tt, c) => { if (tt < MAG.t - .3) return; const u = Math.min(1, (tt - MAG.t + .3) / .3); W.drawPinMagnet(ctx, MAG.x, MAG.y, c, { size: 120, lift: 1 - u * u }); } });
 board.objs.push({ draw: (ctx, tt, c) => { for (const p of [K, B, O]) W.drawMarker(ctx, p, W.penPose(p, tt, cam), c, tt); } });
 const SUB_Y = SH - 150;

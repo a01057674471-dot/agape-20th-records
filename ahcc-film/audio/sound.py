@@ -43,7 +43,12 @@ room = (lp(brown(DUR), 300) * .02).astype(np.float32); fol[:, 0] += room; fol[:,
 
 # ---------- voice ----------
 have = 0
-for l in C['lines']:
+one = os.path.join(ROOT, 'voices', 'narration.wav')
+if C.get('voiceAt') is not None and os.path.exists(one):     # one recording for the whole script
+    x, sr = sf.read(one, dtype='float32'); x = x.mean(1) if x.ndim > 1 else x
+    if sr != SR: x = soxr.resample(x, sr, SR)
+    add(voice, x, C['voiceAt'], 1, 0); have = len(C['lines'])
+for l in ([] if have else C['lines']):
     p = os.path.join(ROOT, 'voices', l['id'] + '.wav')
     if not os.path.exists(p): continue
     x, sr = sf.read(p, dtype='float32'); x = x.mean(1) if x.ndim > 1 else x
