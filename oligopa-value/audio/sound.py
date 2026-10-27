@@ -1,4 +1,4 @@
-# 올리고파 (value cut) — print foley only, no music: metal type, paper, utility knife, steel rule, wooden blocks → out/mix.wav
+# 올리고파 (value cut) — the user's narration + print foley, no music: metal type, paper, utility knife, steel rule, wooden blocks → out/mix.wav
 # Every sound is an event the picture already placed on the beat (audio/cues.json). Dry and close, no reverb.
 # run: LIB=<library> $LIB/.venv/bin/python audio/sound.py
 import os, sys, json
@@ -65,7 +65,23 @@ for e in C['ev']:
 room = lp(brown(DUR), 200)[:N] * .006; fol[:, 0] += room; fol[:, 1] += room   # a quiet studio, so the cuts aren't digital black
 s0 = [e for e in C['ev'] if e['type'] == 'silence']                              # an optional beat of real silence
 a, b = (int(s0[0]['t'] * SR), int((s0[0]['t'] + s0[0]['d']) * SR)) if s0 else (0, 0)
-mix = fol.copy(); mix[a:b] = 0
+# the narration (voices/narration.wav, the user's recording) in the pieces film.js lists; foley sits ~12 dB under it and dips a little more while it speaks
+rms = lambda x: float(np.sqrt((x ** 2).mean()) + 1e-9)
+vp = os.path.join(ROOT, 'voices', 'narration.wav')
+if C.get('voice') and os.path.exists(vp):
+    v, sr = sf.read(vp, dtype='float32'); v = v.mean(1) if v.ndim > 1 else v
+    if sr != SR: v = soxr.resample(v, sr, SR)
+    voice = np.zeros((N, 2))
+    for a0, a1, at in C['voice']:                                  # each piece cut inside a pause, 10 ms edges
+        pc = v[int(a0 * SR):int(a1 * SR)].copy(); k = int(.01 * SR)
+        pc[:k] *= np.linspace(0, 1, k); pc[-k:] *= np.linspace(1, 0, k); add(voice, pc, at, 1, 0)
+    act = np.convolve((np.abs(voice[:, 0]) > 1e-3).astype(float), np.ones(int(.15 * SR)) / int(.15 * SR), 'same')
+    duck = 1 - .45 * np.clip(act * 4, 0, 1)
+    vr = rms(voice[np.abs(voice[:, 0]) > 1e-3])
+    mix = voice + fol / rms(fol[np.abs(fol[:, 0]) > 1e-3]) * vr * 10 ** (-12 / 20) * duck[:, None]
+else:
+    mix = fol.copy()
+mix[a:b] = 0
 
 import subprocess, tempfile, re
 def lufs(x):

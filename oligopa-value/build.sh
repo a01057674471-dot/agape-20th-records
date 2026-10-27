@@ -15,5 +15,5 @@ sh core/render/mux.sh "$HERE/out/video.mp4" "$HERE/out/mix.wav" "$HERE/oligopa.m
 # mix.wav carries trailing silence for mux.sh's length check: cut the film back to the picture
 VD=$(ffprobe -v error -select_streams v:0 -show_entries stream=duration -of csv=p=0 "$HERE/oligopa.mp4")
 ffmpeg -v error -y -i "$HERE/oligopa.mp4" -t "$VD" -c copy -movflags +faststart "$HERE/out/trim.mp4" && mv "$HERE/out/trim.mp4" "$HERE/oligopa.mp4"
-node core/render/still.mjs "$HERE" 41.5 --size 1080x1920 --out "$HERE/out" --prefix poster_
-cp "$HERE/out/poster_41.5.jpg" "$HERE/poster.jpg"
+node core/render/still.mjs "$HERE" 38.5 --size 1080x1920 --out "$HERE/out" --prefix poster_
+cp "$HERE/out/poster_38.5.jpg" "$HERE/poster.jpg"

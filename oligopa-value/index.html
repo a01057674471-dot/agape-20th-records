@@ -18,6 +18,7 @@ for (let t = 0; t < F.DUR; t += .125) F.render(g, t);      // registers every te
 window.DUR = F.DUR;
 window.render = t => F.render(g, t);
 window.EV = F.events();
+window.VOICE = F.VOICE;
 window.TEXTS = t => F.texts(t).map(x => ({ id: x.id, text: x.text, x0: x.box[0], y0: x.box[1], x1: x.box[0] + x.box[2], y1: x.box[1] + x.box[3] }));
 window.READY = true;
 </script>

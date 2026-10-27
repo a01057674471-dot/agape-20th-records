@@ -1,9 +1,9 @@
-// 올리고파 — 42 s portrait ad, Swiss Motion Graphics. Value first: the viewer's empty battery, three moments it happens,
+// 올리고파 — 39 s portrait ad, cut to the user's narration, Swiss Motion Graphics. Value first: the viewer's empty battery, three moments it happens,
 // the answer (하루 1포), then the reasons (high dose, low-molecular polyphenol 2~8배), the routine, the product and a call to action.
 // Paper / ink / greys and one signal colour (lime = energy). Every element snaps to a 6-column grid on a 120 bpm beat. No music: print foley.
 import { lerp, seg, snap, lin, steps, E8, E16, BEAT } from './ease.js';
 
-export const W = 1080, H = 1920, DUR = 42;
+export const W = 1080, H = 1920, DUR = 39;
 export const C = { page: '#ECEBE6', paper: '#FFFFFF', ink: '#111111', grid: '#D3D2CC', mute: '#77766F', lime: '#B4EC2D' };
 const M = 72, CW = 136, GU = 24;
 const fx = i => M + i * (CW + GU);
@@ -11,15 +11,18 @@ const FAM = 'NotoKR';
 
 // ---------- key moments (seconds, on the eighth-note grid) ----------
 export const K = {
-  drain: [.5, .75, 1.0, 1.25, 1.5], empty: 2.0, cutA: 4.5,                           // 01 battery 100 → 10
-  cells: [4.75, 5.25, 5.75], cutB: 10.5,                                               // 02 three moments
-  lead3: 10.75, one: 11.0, name: 11.25, batt: 11.5, charge: [12.0, 13.5], up: 12.25, cutC: 15.5,   // 03 the answer
-  grid: 15.75, head: 16.0, rows: [16.75, 17.25, 17.75, 18.25], push: 22.0, pushD: .75,              // 04 high dose
-  limeIn: 22.0, lyc: 22.25, square: 22.75, label: 23.0, knives: 23.75, apart: 24.75, small: 25.25,  // 05 low-molecular
-  lead5: 24.75, big: [25.25, 25.75], foot: 24.25, limeWipe: 30.0,
-  taste: 30.25, sticks: 30.75, pack: 32.25, day: 32.5, card: 36.0,                                  // 06 the routine
-  title: 36.0, rule: 36.5, badges: 36.75, cta: 37.5,                                                // 07 product + CTA
+  drain: [.25, .5, .75, 1.0, 1.25], empty: .5, cutA: 3.4,                              // 01 battery 100 → 10      (voice 0.2 오늘도 방전이에요?)
+  cells: [3.5, 5.0, 6.5], cutB: 7.75,                                                  // 02 three moments         (3.6 / 5.1 / 6.6)
+  lead3: 7.8, one: 8.9, name: 9.9, batt: 10.25, charge: [10.75, 11.5], cutC: 11.875,   // 03 the answer            (7.9 한 잔 더 대신 / 9.0 하루 한 포 / 10.1 올리고파)
+  grid: 11.875, row0Label: 12.0, head: 12.25, rows: [13.875, 16.5, 16.875, 17.25], push: 18.75, pushD: .75,   // 04 (12.0 엘 아르지닌 / 14.0 천 밀리그램 / 16.1 고함량 에너지 부스터)
+  limeIn: 18.75, lyc: 18.5, square: 19.75, label: 20.0, knives: 20.75, apart: 21.75, small: 22.25,     // 05 (18.6 리치추출분말 올리고놀…)
+  lead5: 22.625, big: [24.75, 25.25], foot: 22.125, limeWipe: 27.5,                                  //    (22.8 일반 원료 대비 … 두 배에서 여덟 배)
+  taste: 27.375, sticks: 27.75, pack: 28.75, day: 29.0, card: 32.375,                               // 06 (27.65 상큼한 리치맛 / 29.1 하루 한 포씩)
+  title: 32.375, rule: 32.875, tag: 33.125, badges: 33.625, cta: 34.375,                             // 07 (32.25 closing line)
 };
+// voices/narration.wav (the user's recording, 31.2 s) placed in three pieces [from, to, at] (seconds): the gaps give
+// the comparison and the 14 sticks their reading time
+export const VOICE = [[0, 26.16, 0], [26.16, 28.75, 27.5], [28.75, 31.22, 31.94]];
 
 // ---------- text ----------
 function font(g, wt, size) {
@@ -132,7 +135,7 @@ function sceneCells(g, t) {
       if (p <= 0) return;
       g.fillStyle = C.ink; g.fillRect(M, y0, (W - 2 * M) * p, 2);
       numeral(g, 'cellt' + i, hh, M, y0 + 210, 170, C.ink, t0, t0 + BEAT, 99);
-      say(g, 'cell' + i, s, M, y0 + 330, 64, 700, C.ink, t0 + BEAT, 99);
+      say(g, 'cell' + i, s, M, y0 + 330, 64, 700, C.ink, t0, 99);
       say(g, 'cellw' + i, who, fx(4), y0 + 50, 28, 500, C.mute, t0 + E8, 99);
       if (t > t0 + BEAT + E8) {
         const r = snap(t, t0 + BEAT + E8 * 2, E8);
@@ -159,7 +162,6 @@ function sceneAnswer(g, t) {
       font(g, 900, 120); g.fillStyle = C.ink; g.fillText(`${Math.round(lv * 100)}%`, M + 50, 1270);
       g.restore();
     }
-    say(g, 'up', '하루 1포로 에너지 UP', M, 1640, 72, 900, C.ink, K.up, 99);
     captions(g, 96, K.lead3, 99, '하루 1포', '03 / 07', '15g 스틱');
   });
 }
@@ -179,7 +181,7 @@ function specSheet(g, t) {
   say(g, 'grid', '고함량 에너지 부스터', M, 340, 92, 900, C.ink, K.head + E8, 99);
   ROWS.forEach(([name, n, mg], i) => {
     const t0 = K.rows[i], y = rowY(i);
-    say(g, 'row' + i, name, M, y, 32, 500, C.mute, t0 - E8, 99);
+    say(g, 'row' + i, name, M, y, 32, 500, C.mute, i ? t0 - E8 : K.row0Label, 99);
     numeral(g, 'rown' + i, n, M, y + 112, 96, C.ink, t0, t0 + BEAT, 99, n + 'mg');
     font(g, 900, 96); const nw = tw(g, n);
     say(g, 'rowu' + i, 'mg', M + nw + 12, y + 112, 40, 700, C.ink, t0 + BEAT, 99);
@@ -250,7 +252,7 @@ function sceneSticks(g, t) {
 
 // 07 · 36–42: the product on paper, the name, badges, and the call to action on a lime bar
 function sceneProduct(g, t) {
-  const p = snap(t, K.card + E8 * 2, E8 * 2), cy = 620, ch = 760;
+  const p = snap(t, K.card + E8 * 2, E8 * 2), cy = 620, ch = 660;
   if (p > 0) {
     g.save(); g.beginPath(); g.rect(M, cy, W - 2 * M, ch * p); g.clip();
     g.fillStyle = C.paper; g.fillRect(M, cy, W - 2 * M, ch);
@@ -259,6 +261,7 @@ function sceneProduct(g, t) {
   }
   numeral(g, 'title', '올리고파', M, 500, 230, C.ink, K.title, K.title + BEAT, 99);
   g.fillStyle = C.lime; g.fillRect(M, 546, (W - 2 * M) * lin(t, K.rule, K.rule + E8 * 2), 14);
+  say(g, 'tag', '하루 1포로 에너지 UP', M, 1365, 60, 900, C.ink, K.tag, 99);
   captions(g, 1420, K.badges, 99, '의사 공동개발', 'HACCP', 'RAPHAHEAL', C.ink, 30);
   reg('badges', '의사 공동개발 HACCP RAPHAHEAL', K.badges, DUR, [M, 1420, W - 2 * M, 60]);
   // call to action: a lime bar wipes in from the left, black type rises onto it

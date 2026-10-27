@@ -4,7 +4,7 @@ const LIB = process.env.LIB; if (!LIB) { console.error('set LIB to the library f
 const { openDemo, closeServer } = await import(path.join(LIB, 'core/render/page.mjs'));
 const film = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const { browser, page } = await openDemo(film, { w: 1080, h: 1920 });
-const r = await page.evaluate(() => ({ ev: window.EV, dur: window.DUR }));
+const r = await page.evaluate(() => ({ ev: window.EV, dur: window.DUR, voice: window.VOICE }));
 fs.writeFileSync(path.join(film, 'audio/cues.json'), JSON.stringify(r));
 console.log('cues', r.ev.length, 'events, dur', r.dur);
 await browser.close(); closeServer();
