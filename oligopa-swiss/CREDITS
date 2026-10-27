@@ -1,0 +1,11 @@
+올리고파 (RAPHAHEAL) — 40.5 s portrait product film, Swiss Motion Graphics style
+
+Copy and figures: see FACTS.md (each on-screen line with its source on the product detail page supplied by the client).
+'올리고파', 'RAPHAHEAL' and the package photo belong to the brand owner; Oligonol® is a registered trademark of its owner.
+  Package photo: cropped from the client's detail-page image (assets/package.jpg).
+
+Picture: drawn by code in this folder (film.js). ease.js is copied from the Lemo-Opuscar library's Swiss Motion demo (MIT licence).
+
+Font (SIL Open Font License 1.1; licence in fonts/): Noto Sans KR (Medium, Bold, Black; subset) — Google / Adobe.
+
+Sound: procedural print foley (audio/sound.py), adapted from the Swiss Motion demo's foley. No music.
