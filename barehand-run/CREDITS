@@ -1,0 +1,17 @@
+겨울 내내 맨손으로 달리면? — 35 s portrait reel, Pictogram Motion style (research-based simulation)
+
+Facts: see FACTS.md (every number on screen with its source).
+
+Picture: drawn by code in this folder (film.js). engine.js is adapted from the Lemo-Opuscar library's Pictogram Motion demo
+  (MIT licence); the palette, cards, hand and thermometer pictograms are this film's own.
+
+Fonts (SIL Open Font License 1.1; licence files in fonts/):
+  Inter Tight (ExtraBold, Black; subset) — The Inter Tight Project Authors
+  DM Mono (Medium; subset) — The DM Mono Project Authors
+  Noto Sans KR (Medium–Black; subset) — Google / Adobe
+
+Music & sound: original composition and procedural foley (audio/score.py).
+  Drums: "MuldjordKit" by Lars Muldjord (drumgizmo.org), FreePats version, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+  Bass: FreePats project (freepats.zenvoid.org), CC0 1.0
+  Glockenspiel, vibraphone, claps, shaker: Versilian Community Sample Library (Versilian Studios), CC0 1.0
+  Timpani: VS Chamber Orchestra: Community Edition (Versilian Studios), CC0 1.0
