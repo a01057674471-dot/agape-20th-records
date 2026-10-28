@@ -1,4 +1,4 @@
-// 겨울 내내 맨손으로 달리면? — 35 s portrait reel in the Pictogram Motion style.
+// 만약 겨울 내내 영하에서 맨손으로 달린다면? — 35 s portrait reel in the Pictogram Motion style.
 // Eight cards on a 120 bpm grid (1 beat = 0.5 s): the hook, the wind a run makes, the finger at 15 °C, the 3-week lab study,
 // its results, the twist, a runner's checklist, and a split-screen question. Every cut is a band-slide on a beat.
 const G = window.G;
@@ -8,8 +8,8 @@ const C0 = G.CREAM, INK = G.INK;
 
 // ---------- edit list (seconds) ----------
 export const CARDS = [
-  { id: 'hook',   t0: 0,    t1: 3,    pal: 'night', ch: 'WHAT IF',        en: 'BARE HANDS, ALL WINTER' },
-  { id: 'wind',   t0: 3,    t1: 10.5, pal: 'ice',   ch: 'WIND CHILL',     en: 'YOUR PACE IS A HEADWIND' },
+  { id: 'hook',   t0: 0,    t1: 4.625,    pal: 'night', ch: 'WHAT IF',        en: 'BARE HANDS, ALL WINTER' },
+  { id: 'wind',   t0: 4.625, t1: 10.5, pal: 'ice',   ch: 'WIND CHILL',     en: 'YOUR PACE IS A HEADWIND' },
   { id: 'finger', t0: 10.5, t1: 13.75, pal: 'frost', ch: 'ONE RUN',        en: 'FINGER SKIN 15°C' },
   { id: 'study',  t0: 13.75, t1: 17.5, pal: 'night', ch: 'ALL WINTER',     en: '3-WEEK LAB STUDY' },
   { id: 'result', t0: 17.5, t1: 22.75,   pal: 'snow',  ch: 'RESULT',         en: 'AFTER 15 SESSIONS' },
@@ -19,7 +19,7 @@ export const CARDS = [
 ];
 const N = CARDS.length;
 export const K = {
-  wind: [3.25, 5.0, 7.0], warn: 7.25,
+  wind: [4.75, 6.0, 7.25], warn: 7.3,
   gauge: [10.75, 12.0], studyLine: 14.0, count: [14.5, 16.5],
   rows: [17.75, 18.25, 18.75, 19.25], silence: [22.5, 22.75],
   checks: [27.0, 27.5, 28.0], cta: 31.75,
@@ -125,11 +125,14 @@ const TX = 80;      // text column x
 function cardHook(ctx, t, c, C) {
   sun(ctx, W / 2, 640, 380, C, t); snow(ctx, t, C);
   figure(ctx, run(t), W / 2, 690, 620, C, 1, (cx, J) => hands(cx, J, C.acc, .05));
-  index(ctx, 0, TX, 1130, C, t, c.t0);
-  line(ctx, 'h1', '영하 맨손 러닝', TX, 1320, G.F.kr(900, G.fitFont(ctx, '영하 맨손 러닝', 'kr', 900, 170, W - 160)), C.fg, t, .15, c.t1);
-  line(ctx, 'h2', '손이 적응할까?', TX, 1480, G.F.kr(900, 120), C.acc, t, .3, c.t1);
+  index(ctx, 0, TX, 1090, C, t, c.t0);
+  // the title, from the first frame: three lines, the last one in the warm accent
+  const L1 = '만약 겨울 내내', L2 = '영하에서 맨손으로', L3 = '달린다면?';
+  line(ctx, 'h1', L1, TX, 1250, G.F.kr(900, G.fitFont(ctx, L2, 'kr', 900, 140, W - 160)), C.fg, t, -.3, c.t1, { text: L1 + ' ' + L2 + ' ' + L3 });
+  line(ctx, 'h2', L2, TX, 1410, G.F.kr(900, G.fitFont(ctx, L2, 'kr', 900, 140, W - 160)), C.fg, t, -.2, c.t1);
+  line(ctx, 'h3', L3, TX, 1610, G.F.kr(900, 190), C.acc, t, -.1, c.t1);
 }
-const WIND = [['−15°C', '기온 −10°C · 6분 페이스 (시속 10km)'], ['−20°C', '+ 맞바람 시속 20km'], ['−26°C', '기온 −15°C + 맞바람 시속 20km']];
+const WIND = [['−15°C', '기온 −10°C · 6분 페이스 (시속 10km)'], ['−20°C', '+ 맞바람 시속 20km'], ['−26°C', '−15°C + 맞바람 20km/h']];
 function cardWind(ctx, t, c, C) {
   sun(ctx, W / 2, 600, 340, C, t);
   // the runner holds still while the wind streams past: the pace is the headwind
@@ -153,8 +156,8 @@ function cardWind(ctx, t, c, C) {
   if (t >= K.warn) {
     const p2 = E.oExp(clamp((t - K.warn) / .3));
     ctx.save(); ctx.beginPath(); ctx.rect(0, 1650, W * p2, 120); ctx.clip();
-    chip(ctx, '−27°C 아래 = 동상 위험 급증', TX, 1730, '#ff5a36', C0, 44); ctx.restore();
-    reg('warn', '−27°C 아래 = 동상 위험 급증', K.warn, c.t1, [TX, 1680, 700, 60]);
+    chip(ctx, '−27°C부터 동상 위험 급증', TX, 1730, '#ff5a36', C0, 44); ctx.restore();
+    reg('warn', '−27°C부터 동상 위험 급증', K.warn, c.t1, [TX, 1680, 700, 60]);
   }
 }
 function cardFinger(ctx, t, c, C) {
