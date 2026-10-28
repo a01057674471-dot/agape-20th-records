@@ -1,7 +1,8 @@
-# 맨손 겨울 러닝 — picture-locked score + foley, one file → out/mix.wav
-# 120 bpm, D minor (Dm–B♭–F–C, one chord per bar). A running groove (kick, snare, 16th hats, a shaker for the stride, finger bass),
+# 맨손 겨울 러닝 — the user's narration + picture-locked score + foley, one file → out/mix.wav
+# 150 bpm, D minor (Dm–B♭–F–C, one chord per bar). A running groove (kick, snare, 16th hats, a shaker for the stride, finger bass),
 # glockenspiel for the ice. Each card sets the density; the picture's events (audio/cues.json) place every accent.
-# Half a beat of total silence before the twist, then one big hit and a half-time bar. CC0 / CC BY samples (see CREDITS).
+# Foley keeps attention on the screen: a whoosh and a low hit on every cut, a tick on every line that slides up, a riser into
+# the half beat of silence before the twist. The voice leads; music sits ~14 dB under it. CC0 / CC BY samples (see CREDITS).
 # run: LIB=<library> $LIB/.venv/bin/python audio/score.py
 import os, sys, json
 LIB = os.environ['LIB']; sys.path.insert(0, LIB)
@@ -11,7 +12,7 @@ from core.audio.sfx import SR, add, bp, hp, lp, limit, noise, t_, env_exp, norm,
 
 D = os.path.dirname(os.path.abspath(__file__)); ROOT = os.path.join(D, '..'); OUT = os.path.join(ROOT, 'out'); os.makedirs(OUT, exist_ok=True)
 C = json.load(open(os.path.join(D, 'cues.json')))
-DUR = C['dur']; N = int(DUR * SR); BEAT = .5; S16 = BEAT / 4
+DUR = C['dur']; N = int(DUR * SR); BEAT = .4; S16 = BEAT / 4
 S.seed(11); rng = np.random.default_rng(11)
 cut = {e['card']: e['t'] for e in C['ev'] if e['type'] == 'cut'}
 sil = [e for e in C['ev'] if e['type'] == 'silence'][0]; SIL0, SIL1 = sil['t'], sil['t'] + sil['d']
@@ -27,7 +28,7 @@ kit = lambda t, v, vel, pan=0: ev.append(dict(t=t, inst='drum_kit', pitch=v, vel
 
 # ---------- the groove, step by step on sixteenths ----------
 DENS = {'hook': 2, 'wind': 3, 'finger': 1, 'study': 1, 'result': 2, 'twist': 0, 'check': 3, 'cta': 3}
-END = 34.5
+END = DUR - .8
 n16 = int(END / S16)
 for i in range(n16):
     t = i * S16
@@ -61,11 +62,16 @@ for e in C['ev']:
         for j, tm in enumerate(['tom_1', 'tom_2', 'tom_3']): kit(t - S16 * (3 - j), tm, .5 + j * .1)
         kit(t, 'kick_drum_left', 1.0); GL(t, ['A5', 'F5', 'D5', 'D6'][e['k']], .38)
     if k == 'warn': kit(t, 'china', .7)
+    if k == 'drop':
+        for j, p in enumerate(['A5', 'F5', 'D5']): GL(t + j * S16, p, .3, .6)
+        kit(t, 'tom_4', .7)
+    if k == 'numb': kit(t, 'china', .6); GL(t, 'D7', .3)
+    if k == 'vs': kit(t, 'tom_2' if e['k'] == 0 else 'tom_3', .7); ev.append(dict(t=t, inst='claps', pitch='group', vel=.5, pan=0))
     if k == 'gauge':
         for j, p in enumerate(['D6', 'A5', 'F5', 'D5']): GL(t + j * e['d'] / 3, p, .3, .8)
     if k == 'count': ev.append((t, 'glockenspiel', 'D6' if e['d'] < 14 else 'D7', .25, .14 if e['d'] < 14 else .4, .4))
-    if k == 'row': kit(t, 'snare_2', .55); GL(t, ['F6', 'D5', 'C5', 'A4'][e['k']], .34)
-    if k == 'check': ev.append(dict(t=t, inst='claps', pitch='group', vel=.55, pan=0)); GL(t, ['D6', 'F6', 'A6'][e['k']], .32)
+    if k == 'row': kit(t, 'snare_2', .55); GL(t, ['F6', 'C5'][e['k']], .34)
+    if k == 'check': ev.append(dict(t=t, inst='claps', pitch='group', vel=.6, pan=0)); GL(t, 'A6', .34)
 ev.append(dict(t=SIL1, inst='timpani', pitch='D2', dur=2.5, vel=.8, pan=0)); kit(SIL1, 'crash_left', .9); kit(SIL1, 'kick_drum_left', 1.0)
 ev += [dict(t=SIL1, inst='vibraphone', pitch=p, dur=3.5, vel=.25, pan=.2) for p in ('D3', 'A3', 'F4')]
 ev += [dict(t=END, inst=i, pitch=p, dur=DUR - END, vel=v, pan=pn) for i, p, v, pn in
@@ -85,20 +91,40 @@ def crack():                                    # ice crack for the −27 warnin
     return norm(x + np.sin(2 * np.pi * 70 * tt) * env_exp(d, .08) * .8)
 def splash():                                   # a hand into cold water
     d = .3; tt = t_(d); return norm(bp(noise(d), 600, 5000) * env_exp(d, .06) + np.sin(2 * np.pi * 180 * tt * (1 + tt)) * env_exp(d, .03) * .3)
+def thud():                                     # a short low hit under each cut and number
+    d = .25; tt = t_(d); return norm(np.sin(2 * np.pi * 62 * tt * (1 - .3 * tt)) * env_exp(d, .07) + lp(noise(d), 300) * env_exp(d, .01) * .4)
+def tick():                                     # a dry click as a line of type lands
+    d = .03; tt = t_(d); return norm(np.sin(2 * np.pi * 3400 * tt) * env_exp(d, .004) + hp(noise(d), 5000) * env_exp(d, .0012) * .6)
+def riser(d):                                   # band-passed noise rising into the silence
+    n = noise(d); u = np.linspace(0, 1, len(n)); out = np.zeros_like(n); hop = 480
+    for i in range(0, len(n), hop):
+        fc = 400 + 6000 * (i / len(n)) ** 2; s = bp(n[max(0, i - 2400):i + hop], fc * .7, min(fc * 1.4, 20000))[-hop:]; out[i:i + len(s)] = s
+    return norm(out) * u ** 2
 def boom():                                     # sub drop under the twist
     d = 1.4; tt = t_(d); f = 70 * np.exp(-tt / .5) + 32; return np.sin(2 * np.pi * np.cumsum(f) / SR) * env_exp(d, .5)
-ws = [e['t'] for e in C['ev'] if e['type'] == 'slam' and e['k'] < 3]
+ws = [e['t'] for e in C['ev'] if e['type'] == 'slam' and e['k'] < 2]
 for j, t in enumerate(ws):
     t1 = ws[j + 1] if j + 1 < len(ws) else cut['finger']
     add(fol, wind(t1 - t + .2) * (.5 + .25 * j), t - .1, 1, 0)
 for e in C['ev']:
     if e['type'] == 'warn': add(fol, crack(), e['t'], .7, .2)
     if e['type'] == 'dip': add(fol, splash(), e['t'] + .12, .35, -.2)
-    if e['type'] == 'cut': add(fol, whoosh(.3), e['t'] - .2, .25, 0)
+    if e['type'] == 'cut' and e['t'] > 0:                       # every cut: a whoosh into a short low hit
+        add(fol, whoosh(.25), e['t'] - .18, .35, 0); add(fol, thud(), e['t'], .5, 0)
+    if e['type'] == 'text': add(fol, tick(), e['t'] + .06, .22, float(rng.uniform(-.3, .3)))
+    if e['type'] == 'slam': add(fol, thud(), e['t'], .7, 0)
 add(fol, boom(), SIL1, .9, 0)
+add(fol, riser(1.2), SIL0 - 1.2, .45, 0)
 
 rms = lambda x: float(np.sqrt((x ** 2).mean()) + 1e-9)
-mix = music + fol * rms(music) / rms(fol) * 10 ** (-8 / 20)
+# the narration (voices/narration.wav, built by tools/voice.py) leads; music ~14 dB under it and ducked a further 4 dB while it speaks
+v, sr = sf.read(os.path.join(ROOT, 'voices', 'narration.wav'), dtype='float32'); v = v.mean(1) if v.ndim > 1 else v
+if sr != SR: v = soxr.resample(v, sr, SR)
+voice = np.zeros((N, 2)); add(voice, v[:N], 0, 1, 0)
+act = np.convolve((np.abs(voice[:, 0]) > 2e-3).astype(float), np.ones(int(.2 * SR)) / int(.2 * SR), 'same')
+duck = 1 - .37 * np.clip(act * 3, 0, 1)
+vr = rms(voice[np.abs(voice[:, 0]) > 2e-3])
+mix = voice + music / rms(music) * vr * 10 ** (-14 / 20) * duck[:, None] + fol / rms(fol) * vr * 10 ** (-12 / 20)
 a, b = int(SIL0 * SR), int(SIL1 * SR); f = int(.01 * SR)
 mix[a - f:a] *= np.linspace(1, 0, f)[:, None]; mix[a:b] = 0
 k = int(.8 * SR); mix[-k:] *= np.linspace(1, 0, k)[:, None] ** 1.5
@@ -118,8 +144,8 @@ for _ in range(3):
     mix = soxr.resample(up, SR * 4, SR)[:len(mix)]
 mix[a:b] = 0
 print('mastered to', lufs(mix), 'LUFS')
-# 24 s of trailing silence: mux.sh's decode check runs ~2.9 s behind and allows 5 % of the length; build.sh trims back to the picture
-mix = np.concatenate([mix, np.zeros((24 * SR, 2))])
+# 32 s of trailing silence: mux.sh's decode check runs ~2.9 s behind and allows 5 % of the length; build.sh trims back to the picture
+mix = np.concatenate([mix, np.zeros((32 * SR, 2))])
 sf.write(os.path.join(OUT, 'mix.wav'), mix.astype(np.float32), SR)
 names = sorted({(e['inst'] if isinstance(e, dict) else e[1]) for e in ev})
 json.dump(names, open(os.path.join(D, 'instruments.json'), 'w'))

@@ -1,28 +1,25 @@
-// 만약 겨울 내내 영하에서 맨손으로 달린다면? — 35 s portrait reel in the Pictogram Motion style.
-// Eight cards on a 120 bpm grid (1 beat = 0.5 s): the hook, the wind a run makes, the finger at 15 °C, the 3-week lab study,
-// its results, the twist, a runner's checklist, and a split-screen question. Every cut is a band-slide on a beat.
+// 만약 겨울 내내 영하에서 맨손으로 달린다면? — 30 s portrait reel in the Pictogram Motion style, cut to the user's narration.
+// The narration is the core of the script sped up 1.5× (tools/voice.py → voices/times.js); every card and every on-screen word
+// lands when it is spoken. 150 bpm grid (1 beat = 0.4 s), cards start on eighth notes, every cut is a band-slide.
+import { DUR as VDUR, CARD_T0, V } from './voices/times.js';
 const G = window.G;
 const { W, H, E, clamp, lerp, inv } = G;
-export const BPM = 120, BEAT = .5, DUR = 35;
+export const BPM = 150, BEAT = .4, DUR = VDUR;
 const C0 = G.CREAM, INK = G.INK;
+const at = id => V[id][0], end = id => V[id][1];
 
-// ---------- edit list (seconds) ----------
-export const CARDS = [
-  { id: 'hook',   t0: 0,    t1: 4.625,    pal: 'night', ch: 'WHAT IF',        en: 'BARE HANDS, ALL WINTER' },
-  { id: 'wind',   t0: 4.625, t1: 10.5, pal: 'ice',   ch: 'WIND CHILL',     en: 'YOUR PACE IS A HEADWIND' },
-  { id: 'finger', t0: 10.5, t1: 13.75, pal: 'frost', ch: 'ONE RUN',        en: 'FINGER SKIN 15°C' },
-  { id: 'study',  t0: 13.75, t1: 17.5, pal: 'night', ch: 'ALL WINTER',     en: '3-WEEK LAB STUDY' },
-  { id: 'result', t0: 17.5, t1: 22.75,   pal: 'snow',  ch: 'RESULT',         en: 'AFTER 15 SESSIONS' },
-  { id: 'twist',  t0: 22.75, t1: 26.75, pal: 'heat',  ch: 'THE TWIST',      en: 'NUMB, NOT ADAPTED' },
-  { id: 'check',  t0: 26.75, t1: 31.5, pal: 'night', ch: 'RUNNER CHECK',   en: 'BEFORE YOU GO OUT' },
-  { id: 'cta',    t0: 31.5, t1: 35,   pal: 'ice',   ch: 'YOUR CALL',      en: 'GLOVES OR BARE?' },
+// ---------- edit list (seconds, from the narration) ----------
+const SPEC = [
+  ['hook', 'night', 'WHAT IF'], ['wind', 'ice', 'WIND CHILL'], ['finger', 'frost', 'ONE RUN'], ['study', 'night', 'ALL WINTER'],
+  ['result', 'snow', 'RESULT'], ['twist', 'heat', 'THE TWIST'], ['check', 'night', 'RUNNER CHECK'], ['cta', 'ice', 'YOUR CALL'],
 ];
+export const CARDS = SPEC.map(([id, pal, ch], i) => ({ id, pal, ch, t0: CARD_T0[id], t1: i + 1 < SPEC.length ? CARD_T0[SPEC[i + 1][0]] : DUR }));
 const N = CARDS.length;
 export const K = {
-  wind: [4.75, 6.0, 7.25], warn: 7.3,
-  gauge: [10.75, 12.0], studyLine: 14.0, count: [14.5, 16.5],
-  rows: [17.75, 18.25, 18.75, 19.25], silence: [22.5, 22.75],
-  checks: [27.0, 27.5, 28.0], cta: 31.75,
+  wind: [at('v04'), at('v08')], warn: at('v08'),
+  gauge: [at('v10'), end('v10')], fing2: at('v11'), studyLine: at('v13'), count: [at('v14'), end('v14')],
+  pain: at('v16'), civd: at('v18'), civdDrop: at('v20'), silence: [CARD_T0.twist - .2, CARD_T0.twist],
+  numb: at('v23'), check: at('v24'), vs: [at('v28'), at('v29')], cta: at('v30'),
 };
 
 // ---------- text registry (reading check) ----------
@@ -35,7 +32,7 @@ function line(ctx, id, s, x, y, font, col, t, t0, t1, o = {}) {
   const asc = o.asc ?? m.actualBoundingBoxAscent;
   reg(id, o.text ?? s, t0, t1, [x - (o.align === 'right' ? m.width : 0), y - asc, m.width, asc + 10]);
   if (t < t0) return 0;
-  return G.maskText(ctx, s, x, y, font, col, clamp((t - t0) / .35), { align: o.align, ls: o.ls });
+  return G.maskText(ctx, s, x, y, font, col, clamp((t - t0) / .22), { align: o.align, ls: o.ls });
 }
 
 // ---------- pieces ----------
@@ -70,7 +67,7 @@ function figure(ctx, pose, x, y, s, C, asm = 1, extra) {
   }
   return J;
 }
-const run = (t, k = 1) => Object.assign(G.runCycle(t / BEAT / 2, k), { x: 0 });      // one stride cycle every two beats
+const run = (t, k = 1) => Object.assign(G.runCycle(t / BEAT / 2, k), { x: 0 });      // one stride cycle every two beats (0.8 s)
 // bare hands: two warm discs; mittens: bigger amber capsules
 function hands(ctx, J, col, r = .045) { G.disc(ctx, J.aL[2][0], J.aL[2][1], r, col); G.disc(ctx, J.aR[2][0], J.aR[2][1], r, col); }
 // a pictogram hand (unit = palm height), fingers coloured by temperature
@@ -132,32 +129,31 @@ function cardHook(ctx, t, c, C) {
   line(ctx, 'h2', L2, TX, 1410, G.F.kr(900, G.fitFont(ctx, L2, 'kr', 900, 140, W - 160)), C.fg, t, -.2, c.t1);
   line(ctx, 'h3', L3, TX, 1610, G.F.kr(900, 190), C.acc, t, -.1, c.t1);
 }
-const WIND = [['−15°C', '기온 −10°C · 6분 페이스 (시속 10km)'], ['−20°C', '+ 맞바람 시속 20km'], ['−26°C', '−15°C + 맞바람 20km/h']];
+const WIND = [['−15°C', '기온 −10°C · 6분 페이스'], ['−27°C', '이 아래부터']];
 function cardWind(ctx, t, c, C) {
   sun(ctx, W / 2, 600, 340, C, t);
   // the runner holds still while the wind streams past: the pace is the headwind
-  figure(ctx, run(t), W / 2 + 40, 650, 560, C, clamp((t - c.t0) / .5), (cx, J) => {
-    const k = 1 + (t > K.wind[1]) + (t > K.wind[2]);
-    for (let i = 0; i < 6 * k; i++) { const ph = ((t * (1.4 + k * .5) + i * .37) % 1); cx.fillStyle = G.rgba(C0, .5); cx.fillRect(.9 - ph * 2.4, -.5 + ((i * 37) % 11) * .1, .35 + (i % 3) * .1, .012); }
-    hands(cx, J, t > K.wind[2] ? '#ff5a36' : C0, .045);
+  figure(ctx, run(t), W / 2 + 40, 650, 560, C, clamp((t - c.t0) / .35), (cx, J) => {
+    const k = 1 + (t > K.wind[1]) * 2;
+    for (let i = 0; i < 6 * k; i++) { const ph = ((t * (2 + k * .6) + i * .37) % 1); cx.fillStyle = G.rgba(C0, .5); cx.fillRect(.9 - ph * 2.4, -.5 + ((i * 37) % 11) * .1, .35 + (i % 3) * .1, .012); }
+    hands(cx, J, t > K.wind[1] ? '#ff5a36' : C0, .045);
   });
   index(ctx, 1, TX, 1030, C, t, c.t0);
-  line(ctx, 'w0', '손이 느끼는 체감온도', TX, 1110, G.F.kr(800, 52), C.fg, t, K.wind[0], c.t1);
-  // the big number: each new value rises in on its beat, the old one leaves upward
-  let i = 0; K.wind.forEach((tk, k) => { if (t >= tk) i = k; });
-  const tk = K.wind[i], p = clamp((t - tk) / .3), big = G.F.en(900, 300);
+  line(ctx, 'w0', '손이 느끼는 체감온도', TX, 1110, G.F.kr(800, 52), C.fg, t, c.t0 + .05, c.t1);
+  // the big number: the new value rises in, the old one leaves upward
+  const i = t >= K.wind[1] ? 1 : 0, tk = K.wind[i], p = clamp((t - tk) / .25);
   ctx.save(); ctx.beginPath(); ctx.rect(0, 1130, W, 300); ctx.clip();
-  ctx.font = big; ctx.letterSpacing = '-8px'; ctx.fillStyle = i === 2 ? '#ffd9cf' : C.fg;
-  if (i && p < 1) ctx.fillText(WIND[i - 1][0], TX - 10, 1400 - E.oExp(p) * 300);
+  ctx.font = G.F.en(900, 300); ctx.letterSpacing = '-8px'; ctx.fillStyle = i ? '#ffd9cf' : C.fg;
+  if (i && p < 1) ctx.fillText(WIND[0][0], TX - 10, 1400 - E.oExp(p) * 300);
   if (t >= K.wind[0]) ctx.fillText(WIND[i][0], TX - 10, 1400 + (1 - E.oExp(p)) * 300);
   ctx.restore();
-  reg('wnum', '−15°C −20°C −26°C', K.wind[0], c.t1, [TX, 1150, 700, 250]);
-  WIND.forEach(([, s], k) => line(ctx, 'wl' + k, s, TX, 1500 + k * 62, G.F.kr(k === i ? 800 : 500, 40), k === i ? C.fg : G.rgba(C.fg, .6), t, K.wind[k] + .1, c.t1));
+  reg('wnum', '−15°C −27°C', K.wind[0], c.t1, [TX, 1150, 700, 250]);
+  line(ctx, 'wl0', WIND[0][1], TX, 1500, G.F.kr(i ? 500 : 800, 44), i ? G.rgba(C.fg, .6) : C.fg, t, K.wind[0] + .05, c.t1);
   if (t >= K.warn) {
-    const p2 = E.oExp(clamp((t - K.warn) / .3));
-    ctx.save(); ctx.beginPath(); ctx.rect(0, 1650, W * p2, 120); ctx.clip();
-    chip(ctx, '−27°C부터 동상 위험 급증', TX, 1730, '#ff5a36', C0, 44); ctx.restore();
-    reg('warn', '−27°C부터 동상 위험 급증', K.warn, c.t1, [TX, 1680, 700, 60]);
+    const p2 = E.oExp(clamp((t - K.warn) / .25));
+    ctx.save(); ctx.beginPath(); ctx.rect(0, 1560, W * p2, 160); ctx.clip();
+    chip(ctx, '동상 위험 급증', TX, 1660, '#ff5a36', C0, 72); ctx.restore();
+    reg('warn', '동상 위험 급증', K.warn, c.t1, [TX, 1580, 700, 100]);
   }
 }
 function cardFinger(ctx, t, c, C) {
@@ -172,8 +168,8 @@ function cardFinger(ctx, t, c, C) {
   G.seg(ctx, [tx, fy], [tx, bot], 34, G.mix(warm, cold, g));
   ctx.font = G.F.en(900, 64); ctx.fillStyle = C.fg; ctx.fillText(`${temp}°`, tx + 70, fy + 22);
   index(ctx, 2, TX, 1130, C, t, c.t0);
-  line(ctx, 'f1', '손가락 15°C', TX, 1320, G.F.kr(900, 170), C.fg, t, c.t0 + .15, c.t1);
-  line(ctx, 'f2', '손놀림 급격히 저하', TX, 1460, G.F.kr(900, 96), '#bfe6ff', t, c.t0 + .3, c.t1);
+  line(ctx, 'f1', '손가락 15°C', TX, 1320, G.F.kr(900, 170), C.fg, t, c.t0 + .05, c.t1);
+  line(ctx, 'f2', '손놀림 급격히 저하', TX, 1460, G.F.kr(900, 96), '#bfe6ff', t, c.t0 + .15, c.t1);
 }
 function cardStudy(ctx, t, c, C) {
   sun(ctx, W / 2, 620, 360, C, t);
@@ -186,7 +182,7 @@ function cardStudy(ctx, t, c, C) {
   for (let i = 0; i < 3; i++) { ctx.fillStyle = G.rgba(C0, .5); ctx.fillRect(W / 2 - 250 + i * 40, 770 + i * 40, 500 - i * 80, 6); }
   ctx.font = G.F.en(900, 56); ctx.fillStyle = C0; ctx.textAlign = 'center'; ctx.fillText('8°C', W / 2, 900); ctx.textAlign = 'left';
   index(ctx, 3, TX, 1060, C, t, c.t0);
-  line(ctx, 's1', '겨울 내내 하면?', TX, 1220, G.F.kr(900, 130), C.fg, t, c.t0 + .1, c.t1);
+  line(ctx, 's1', '겨울 내내 하면?', TX, 1220, G.F.kr(900, 130), C.fg, t, c.t0 + .05, c.t1);
   line(ctx, 's2', '16명 · 8°C 물 · 하루 30분 · 15회', TX, 1310, G.F.kr(700, 44), G.rgba(C.fg, .85), t, K.studyLine, c.t1);
   // day counter: 01 → 15 on sixteenth notes, slam on the downbeat
   const d = Math.max(1, Math.min(15, 1 + Math.floor(inv(K.count[0], K.count[1], t) * 14.999)));
@@ -196,49 +192,43 @@ function cardStudy(ctx, t, c, C) {
     ctx.font = G.F.kr(800, 56); ctx.fillStyle = C.fg; ctx.fillText('회째', TX + 380, 1650);
     reg('count', '01 → 15회째', K.count[0], c.t1, [TX, 1420, 600, 230]);
   }
-  line(ctx, 's3', 'Daanen 외, 2011 · 실험실 연구', TX, 1730, G.F.kr(500, 30), G.rgba(C.fg, .65), t, K.studyLine + .1, c.t1);
+  line(ctx, 's3', 'Daanen 외, 2011 · 실험실 연구', TX, 1730, G.F.kr(500, 30), G.rgba(C.fg, .65), t, c.t0 + .2, c.t1);
 }
-const ROWS = [['통증', 'down'], ['손가락 온도', 'down'], ['스스로 데워지는 반응', 'civd'], ['촉각', 'down']];
 function cardResult(ctx, t, c, C) {
   index(ctx, 4, TX, 300, C, t, c.t0);
-  line(ctx, 'r0', '3주 뒤', TX, 440, G.F.kr(900, 130), C.fg, t, c.t0 + .1, c.t1);
-  ROWS.forEach(([s, kind], k) => {
-    const t0 = K.rows[k], y = 640 + k * 290;
-    if (t < t0) return;
-    const p = E.oExp(clamp((t - t0) / .3));
-    ctx.fillStyle = G.rgba(INK, .14); ctx.fillRect(TX, y - 120, (W - 2 * TX) * p, 2);
-    line(ctx, 'rr' + k, s, TX, y, G.F.kr(900, k === 2 ? 72 : 96), C.fg, t, t0, c.t1);
-    if (kind === 'down') { ctx.save(); ctx.globalAlpha = p; arrow(ctx, W - 170, y - 40, 120, k === 0 ? '#0a7d4f' : '#e0382a'); ctx.restore(); }
-    else {      // CIVD 52 % → 24 %: two bars, the second shrinks in
-      const bw = (W - 2 * TX) * .9;
-      ctx.fillStyle = G.rgba(INK, .25); ctx.fillRect(TX, y + 30, bw * .52, 36);
-      ctx.fillStyle = '#e0382a'; ctx.fillRect(TX, y + 80, bw * lerp(.52, .24, E.io(clamp((t - t0 - .25) / .6))), 36);
-      ctx.font = G.F.en(900, 40); ctx.fillStyle = C.fg; ctx.fillText('52%', TX + bw * .52 + 16, y + 62); ctx.fillText('24%', TX + bw * .24 + 16, y + 112);
-      reg('rciv', '52% → 24%', t0, c.t1, [TX, y + 20, 700, 100]);
-    }
-  });
-  line(ctx, 'rnote', '* 손을 8°C 물에 담근 실험실 연구 기준', TX, 1760, G.F.kr(500, 30), G.rgba(C.fg, .7), t, K.rows[0] + .2, c.t1);
+  line(ctx, 'r0', '3주 뒤', TX, 440, G.F.kr(900, 130), C.fg, t, c.t0 + .05, c.t1);
+  // row 1: pain down (the good-looking news)
+  if (t >= K.pain) { const p = E.oExp(clamp((t - K.pain) / .25)); ctx.fillStyle = G.rgba(INK, .14); ctx.fillRect(TX, 560, (W - 2 * TX) * p, 2);
+    ctx.save(); ctx.globalAlpha = p; arrow(ctx, W - 170, 640, 130, '#0a7d4f'); ctx.restore(); }
+  line(ctx, 'rr0', '통증', TX, 700, G.F.kr(900, 140), C.fg, t, K.pain, c.t1);
+  // row 2: CIVD 52 % → 24 %: two bars, the red one shrinks when the voice says it
+  if (t >= K.civd) {
+    const p = E.oExp(clamp((t - K.civd) / .25)), bw = (W - 2 * TX) * .95;
+    ctx.fillStyle = G.rgba(INK, .14); ctx.fillRect(TX, 860, (W - 2 * TX) * p, 2);
+    ctx.fillStyle = G.rgba(INK, .25); ctx.fillRect(TX, 1080, bw * .52 * p, 70);
+    ctx.fillStyle = '#e0382a'; ctx.fillRect(TX, 1180, bw * lerp(.52, .24, E.io(clamp((t - K.civdDrop) / .35))) * p, 70);
+    ctx.font = G.F.en(900, 72); ctx.fillStyle = C.fg; ctx.fillText('52%', TX + bw * .52 + 20, 1142);
+    if (t >= K.civdDrop) { ctx.fillStyle = '#e0382a'; ctx.fillText('24%', TX + bw * lerp(.52, .24, E.io(clamp((t - K.civdDrop) / .35))) + 20, 1242); }
+    reg('rciv', '52% → 24%', K.civd, c.t1, [TX, 1080, 700, 180]);
+  }
+  line(ctx, 'rr1', '스스로 데워지는 반응', TX, 1000, G.F.kr(900, 88), C.fg, t, K.civd, c.t1);
+  line(ctx, 'rnote', '* 손을 8°C 물에 담근 실험실 연구 기준', TX, 1760, G.F.kr(500, 30), G.rgba(C.fg, .7), t, K.pain, c.t1);
 }
 function cardTwist(ctx, t, c, C) {
   index(ctx, 5, TX, 640, C, t, c.t0);
-  line(ctx, 'x1', '덜 아픈 건', TX, 860, G.F.kr(900, 150), C.fg, t, c.t0 + .05, c.t1);
-  line(ctx, 'x2', '적응이 아니라', TX, 1040, G.F.kr(900, 150), C.fg, t, c.t0 + .3, c.t1);
-  line(ctx, 'x3', '둔해진 것', TX, 1240, G.F.kr(900, 190), '#ffd23f', t, c.t0 + .8, c.t1);
-  line(ctx, 'x4', '→ 동상 위험이 커질 수 있다 (연구진)', TX, 1400, G.F.kr(700, 48), C.fg, t, c.t0 + .6, c.t1, { text: '→ 동상 위험이 커질 수 있다' });
+  line(ctx, 'x1', '덜 아픈 건', TX, 860, G.F.kr(900, 150), C.fg, t, c.t0 + .05, c.t1, { text: '덜 아픈 건 적응이 아니라' });
+  line(ctx, 'x2', '적응이 아니라', TX, 1040, G.F.kr(900, 150), C.fg, t, c.t0 + .15, c.t1);
+  line(ctx, 'x3', '둔해진 것', TX, 1240, G.F.kr(900, 190), '#ffd23f', t, c.t0 + .3, c.t1);
 }
-const CHECKS = ['체감 −27°C 아래면 장갑 필수', '하얗게 질리고 감각 없으면 중단', '얇은 장갑 + 벙어리장갑'];
 function cardCheck(ctx, t, c, C) {
   sun(ctx, W / 2, 560, 320, C, t); snow(ctx, t, C, 9, 18);
-  figure(ctx, run(t), W / 2, 600, 520, C, clamp((t - c.t0) / .5), (cx, J) => { cx.fillStyle = '#ffb020';
+  figure(ctx, run(t), W / 2, 600, 520, C, clamp((t - c.t0) / .35), (cx, J) => { cx.fillStyle = '#ffb020';
     [J.aL[2], J.aR[2]].forEach(h => { cx.beginPath(); cx.roundRect(h[0] - .05, h[1] - .06, .1, .12, .05); cx.fill(); }); });
   index(ctx, 6, TX, 1000, C, t, c.t0);
-  line(ctx, 'c0', '러너 체크', TX, 1150, G.F.kr(900, 120), C.fg, t, c.t0 + .1, c.t1);
-  CHECKS.forEach((s, k) => {
-    const t0 = K.checks[k], y = 1300 + k * 120;
-    if (t >= t0) { const p = E.oBack(clamp((t - t0) / .3)); ctx.save(); ctx.translate(TX + 30, y - 18); ctx.scale(p, p);
-      G.disc(ctx, 0, 0, 30, '#ffb020'); ctx.strokeStyle = INK; ctx.lineWidth = 8; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-13, 0); ctx.lineTo(-3, 11); ctx.lineTo(14, -10); ctx.stroke(); ctx.restore(); }
-    line(ctx, 'ck' + k, s, TX + 84, y, G.F.kr(800, 52), C.fg, t, t0, c.t1);
-  });
+  line(ctx, 'c1', '체감 −27°C 아래', TX, 1200, G.F.kr(900, 120), C.fg, t, c.t0 + .05, c.t1, { text: '체감 −27°C 아래 장갑 필수' });
+  if (t >= c.t0 + .3) { const p = E.oBack(clamp((t - c.t0 - .3) / .25)); ctx.save(); ctx.translate(TX + 56, 1340); ctx.scale(p, p);
+    G.disc(ctx, 0, 0, 56, '#ffb020'); ctx.strokeStyle = INK; ctx.lineWidth = 14; ctx.lineCap = 'round'; ctx.beginPath(); ctx.moveTo(-24, 0); ctx.lineTo(-6, 20); ctx.lineTo(26, -18); ctx.stroke(); ctx.restore(); }
+  line(ctx, 'c2', '장갑 필수', TX + 140, 1390, G.F.kr(900, 150), '#ffb020', t, c.t0 + .3, c.t1);
 }
 function cardCta(ctx, t, c, C) {
   // split screen along a grid line: gloves (ice) | bare (heat)
@@ -250,11 +240,11 @@ function cardCta(ctx, t, c, C) {
   const L = { ...C }, Rr = { ...R };
   figure(ctx, run(t), W * .27, 640, 440, L, 1, (cx, J) => { cx.fillStyle = '#ffb020'; [J.aL[2], J.aR[2]].forEach(h => { cx.beginPath(); cx.roundRect(h[0] - .05, h[1] - .06, .1, .12, .05); cx.fill(); }); });
   if (sp > .3) figure(ctx, run(t + .25), W * .75, 640, 440, Rr, clamp((sp - .3) / .7), (cx, J) => hands(cx, J, '#ffd23f', .045));
-  line(ctx, 'v1', '장갑파', TX, 1020, G.F.kr(900, 96), C.fg, t, c.t0 + .3, c.t1, { text: '장갑파 vs 맨손파' });
-  line(ctx, 'v2', '맨손파', W - TX, 1020, G.F.kr(900, 96), C0, t, c.t0 + .45, c.t1, { align: 'right' });
+  line(ctx, 'v1', '장갑파', TX, 1020, G.F.kr(900, 96), C.fg, t, c.t0 + .1, c.t1, { text: '장갑파 vs 맨손파' });
+  line(ctx, 'v2', '맨손파', W - TX, 1020, G.F.kr(900, 96), C0, t, c.t0 + .2, c.t1, { align: 'right' });
   index(ctx, 7, TX, 1240, C, t, c.t0);
-  line(ctx, 'q1', '당신은?', TX, 1450, G.F.kr(900, 190), C.fg, t, K.cta, c.t1);
-  line(ctx, 'q2', '댓글로 알려주세요', TX, 1580, G.F.kr(800, 72), C.fg, t, K.cta + .3, c.t1);
+  line(ctx, 'q1', '당신은?', TX, 1450, G.F.kr(900, 190), C.fg, t, c.t0 + .1, c.t1);
+  line(ctx, 'q2', '댓글로 알려주세요', TX, 1580, G.F.kr(800, 72), C.fg, t, c.t0 + .3, c.t1);
 }
 const DRAW = { hook: cardHook, wind: cardWind, finger: cardFinger, study: cardStudy, result: cardResult, twist: cardTwist, check: cardCheck, cta: cardCta };
 
@@ -269,7 +259,7 @@ function scene(ctx, i, t) {
 
 // ---------- frame: band-slide transitions on each cut ----------
 let A = null, B = null;
-const TR = .25;
+const TR = .2;
 export function render(ctx, t) {
   if (!A) { A = G.canvas(W, H); B = G.canvas(W, H); }
   let i = CARDS.findIndex(c => t < c.t1); if (i < 0) i = N - 1;
@@ -290,14 +280,13 @@ export function render(ctx, t) {
 // ---------- sound events (the score reads these) ----------
 export function events() {
   const ev = CARDS.map((c, i) => ({ t: c.t0, type: 'cut', card: c.id, i }));
-  K.wind.forEach((t, i) => ev.push({ t, type: 'slam', k: i }));
-  ev.push({ t: K.warn, type: 'warn' });
+  ev.push({ t: K.wind[0], type: 'slam', k: 0 }, { t: K.wind[1], type: 'slam', k: 1 }, { t: K.warn, type: 'warn' });
   ev.push({ t: K.gauge[0], type: 'gauge', d: K.gauge[1] - K.gauge[0] });
   for (let d = 0; d < 15; d++) ev.push({ t: K.count[0] + d * (K.count[1] - K.count[0]) / 14.999, type: 'count', d });
-  for (let b = 1; b < 7; b++) ev.push({ t: 13.75 + b * BEAT, type: 'dip' });
-  K.rows.forEach((t, k) => ev.push({ t, type: 'row', k }));
-  ev.push({ t: K.silence[0], type: 'silence', d: K.silence[1] - K.silence[0] });
-  K.checks.forEach((t, k) => ev.push({ t, type: 'check', k }));
-  ev.push({ t: K.cta, type: 'slam', k: 3 });
+  for (let b = 1; b * BEAT < CARDS[3].t1 - CARDS[3].t0; b++) ev.push({ t: CARDS[3].t0 + b * BEAT, type: 'dip' });
+  ev.push({ t: K.pain, type: 'row', k: 0 }, { t: K.civd, type: 'row', k: 1 }, { t: K.civdDrop, type: 'drop' });
+  ev.push({ t: K.silence[0], type: 'silence', d: K.silence[1] - K.silence[0] }, { t: K.numb, type: 'numb' });
+  ev.push({ t: CARD_T0.check + .3, type: 'check', k: 0 }, { t: K.vs[0], type: 'vs', k: 0 }, { t: K.vs[1], type: 'vs', k: 1 }, { t: K.cta, type: 'slam', k: 3 });
+  for (const x of TXT) if (x.t0 > .05) ev.push({ t: x.t0, type: 'text' });          // every line that slides up gets a tick
   return ev.sort((a, b) => a.t - b.t);
 }
