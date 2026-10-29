@@ -1,0 +1,16 @@
+깻잎인 줄 알았던 그 잎, 일본은 수십 년째 연구 중 — 30 s portrait reel, Copperplate Engraving style
+
+Facts: see FACTS.md.
+Photographs: supplied by the client (assets/p1–p6.jpg); engraved and coloured by code in this folder.
+
+Picture: film.js. engine/ is copied from the Lemo-Opuscar library's Copperplate Engraving demo (MIT licence).
+  The photo engraving (three hatch families from each photograph's own tones), the hand-coloured photo bloom,
+  the two molecular structures and the balance are this film's own.
+
+Fonts (SIL Open Font License 1.1; licence files in fonts/):
+  Bodoni Moda (Medium, SemiBold, italics; subset) — The Bodoni Moda Project Authors
+  Noto Serif KR (SemiBold, Bold; subset) — Google
+
+Music & sound: original composition and procedural printmaking foley (audio/score.py).
+  Harpsichord, glockenspiel: Versilian Community Sample Library (Versilian Studios), CC0 1.0
+  Cellos, cello and violin pizzicato: VS Chamber Orchestra: Community Edition (Versilian Studios), CC0 1.0
