@@ -1,5 +1,5 @@
 #!/bin/sh
-# One command, from nothing to shiso.mp4: reading check → cues → score and foley → frames → mux → poster
+# One command, from nothing to shiso.mp4: narration → reading check → cues → score and foley → frames → mux → poster
 set -e
 LIB=${LIB:-/root/lemo-opuscar}
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -7,6 +7,7 @@ export LIB
 [ -f "$LIB/core/render/video.mjs" ] || { echo "set LIB to the library folder"; exit 1; }
 PY="$LIB/.venv/bin/python"
 cd "$LIB"
+python3 "$HERE/tools/voice.py"
 node core/render/readcheck.mjs "$HERE" --size 1080x1920 --step 0.08 --cjk-cps 6
 node "$HERE/tools/export_cues.mjs"
 "$PY" "$HERE/audio/score.py"

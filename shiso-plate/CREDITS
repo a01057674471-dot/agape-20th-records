@@ -11,6 +11,7 @@ Fonts (SIL Open Font License 1.1; licence files in fonts/):
   Bodoni Moda (Medium, SemiBold, italics; subset) — The Bodoni Moda Project Authors
   Noto Serif KR (SemiBold, Bold; subset) — Google
 
+Narration: the client's own recording (voices/source.mp3), cut at its pauses and laid to the plates (tools/voice.py).
 Music & sound: original composition and procedural printmaking foley (audio/score.py).
   Harpsichord, glockenspiel: Versilian Community Sample Library (Versilian Studios), CC0 1.0
   Cellos, cello and violin pizzicato: VS Chamber Orchestra: Community Edition (Versilian Studios), CC0 1.0

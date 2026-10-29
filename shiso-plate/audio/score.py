@@ -1,4 +1,4 @@
-# 깻잎인 줄 알았던 그 잎 — chamber score + printmaking foley, one file → out/mix.wav
+# 깻잎인 줄 알았던 그 잎 — the user's narration + chamber score + printmaking foley, one file → out/mix.wav
 # 100 bpm, G major (G–D/F♯–Em–C). Harpsichord arpeggios carry it; pizzicato strings join on the second plate; a held cello
 # under the lab plate; a glockenspiel ting when the balance levels; one cadence on the last plate that rings out.
 # Foley follows the materials: burin hiss while a photograph is engraved, a sheet laid on the bed at every plate,
@@ -77,7 +77,14 @@ for e in C['ev']:
 room = lp(brown(DUR), 250)[:N] * .006; fol[:, 0] += room; fol[:, 1] += room
 
 rms = lambda x: float(np.sqrt((x ** 2).mean()) + 1e-9)
-mix = music + fol * rms(music) / rms(fol) * 10 ** (-6 / 20)
+# the narration (voices/narration.wav, laid by tools/voice.py) leads; music ~14 dB under it, ducked a further 4 dB while it speaks
+v, sr = sf.read(os.path.join(ROOT, 'voices', 'narration.wav'), dtype='float32'); v = v.mean(1) if v.ndim > 1 else v
+if sr != SR: v = soxr.resample(v, sr, SR)
+voice = np.zeros((N, 2)); add(voice, v[:N], 0, 1, 0)
+act = np.convolve((np.abs(voice[:, 0]) > 2e-3).astype(float), np.ones(int(.2 * SR)) / int(.2 * SR), 'same')
+duck = 1 - .37 * np.clip(act * 3, 0, 1)
+vr = rms(voice[np.abs(voice[:, 0]) > 2e-3])
+mix = voice + music / rms(music) * vr * 10 ** (-14 / 20) * duck[:, None] + fol / rms(fol) * vr * 10 ** (-13 / 20)
 k = int(1.0 * SR); mix[-k:] *= np.linspace(1, 0, k)[:, None] ** 1.5
 
 import subprocess, tempfile, re

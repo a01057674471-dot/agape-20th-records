@@ -1,4 +1,4 @@
-// 깻잎인 줄 알았던 그 잎 — 30 s portrait reel in the Copperplate Engraving style.
+// 깻잎인 줄 알았던 그 잎 — 30 s portrait reel in the Copperplate Engraving style, cut to the user's narration.
 // Six photographs, each engraved into the plate first (three hatch families cut from the photo's own tones),
 // then hand-coloured: the real photograph blooms in under the ink. Roundels carry the details (two molecules,
 // a balance), lettering is cut glyph by glyph, every new plate is a fresh sheet laid on the bed.
@@ -12,25 +12,25 @@ const PLATE = [40, 40, 1040, 1880];
 
 // ---------- edit list ----------
 // photo: assets/pN.jpg, fy: which photo row sits at the centre of the crop (0..1), ink: cutting window, bloom: hand colouring
-export const SC = [
-  { id: 'q',     t0: 0,    t1: 4.6,  photo: 6, fy: .45, ink: [-.8, .9],     bloom: 1.2,  pl: 'I',   sub: 'var. frutescens  &  var. crispa' },
-  { id: 'shiso', t0: 4.6,  t1: 9.0,  photo: 2, fy: .42, ink: [4.6, 5.5],    bloom: 5.35, pl: 'II',  sub: 'var. crispa  —  shiso' },
-  { id: 'chem',  t0: 9.0,  t1: 13.8, photo: 1, fy: .40, ink: [9.0, 9.9],    bloom: 9.75, pl: 'III', sub: 'Rosmarinic acid  ·  Luteolin' },
-  { id: 'lab',   t0: 13.8, t1: 19.0, photo: 5, fy: .50, ink: [13.8, 14.7],  bloom: 14.55, pl: 'IV', sub: 'Ueda et al.  1997  ·  2002' },
-  { id: 'table', t0: 19.0, t1: 24.4, photo: 4, fy: .45, ink: [19.0, 19.9],  bloom: 19.75, pl: 'V',  sub: 'Juice  ·  Yukari  ·  Salad' },
-  { id: 'end',   t0: 24.4, t1: 30,   photo: 3, fy: .38, ink: [24.4, 25.3],  bloom: 25.15, pl: 'VI', sub: 'Perilla frutescens var. crispa' },
+export const SC = [      // cut to the narration (tools/voice.py): each plate opens just before its phrase
+  { id: 'q',     t0: 0,    t1: 3.9,  photo: 6, fy: .45, ink: [-.8, .9],     bloom: 1.2,  pl: 'I',   sub: 'var. frutescens  &  var. crispa' },
+  { id: 'shiso', t0: 3.9,  t1: 9.6,  photo: 2, fy: .42, ink: [3.9, 4.8],    bloom: 4.65, pl: 'II',  sub: 'var. crispa  —  shiso' },
+  { id: 'chem',  t0: 9.6,  t1: 13.1, photo: 1, fy: .40, ink: [9.6, 10.5],   bloom: 10.35, pl: 'III', sub: 'Rosmarinic acid  ·  Luteolin' },
+  { id: 'lab',   t0: 13.1, t1: 18.4, photo: 5, fy: .50, ink: [13.1, 14.0],  bloom: 13.85, pl: 'IV', sub: 'Ueda et al.  1997  ·  2002' },
+  { id: 'table', t0: 18.4, t1: 22.6, photo: 4, fy: .45, ink: [18.4, 19.2],  bloom: 19.05, pl: 'V',  sub: 'Juice  ·  Yukari  ·  Salad' },
+  { id: 'end',   t0: 22.6, t1: 30,   photo: 3, fy: .38, ink: [22.6, 23.5],  bloom: 23.35, pl: 'VI', sub: 'Perilla frutescens var. crispa' },
 ];
 export const K = {
-  answer: 2.7, cut1: [5.5, 5.85], roundels: [10.2, 10.6], balance: 15.0, level: [16.0, 17.0],
-  stops: [[20.3, 21.6], [21.75, 23.0], [23.15, 24.4]], cap6b: 25.5,
+  answer: 2.05, cut1: [6.0, 6.4], roundels: [10.55, 11.45], balance: 14.0, level: [15.6, 16.6],
+  stops: [[18.75, 19.35], [19.4, 19.95], [20.0, 22.0]], cap6b: 24.8,
 };
 const CAPS = {
   q:     [['둘 중 깻잎은 뭘까요?', .1]],
-  shiso: [['이건 자소예요.', 4.7], ['일본 식탁에 늘 오르는 잎', 4.9]],
-  chem:  [['로즈마린산, 루테올린이', 9.1], ['들어 있는 잎', 9.35]],
-  lab:   [['일본에선 면역 반응의 균형,', 13.9], ['TNF-α 조절 작용이 연구됐어요', 14.15]],
-  table: [['주스로, 밥에, 샐러드로.', 19.1], ['일본 식탁의 단골 잎', 19.4]],
-  end:   [['이제 깻잎과 헷갈리지 마세요', 24.5], ['몰랐던 건강 소재, 팔로우하고 더 알아가요', K.cap6b]],
+  shiso: [['이건 자소예요.', 4.0], ['일본 식탁에 늘 오르는 잎', 4.2]],
+  chem:  [['로즈마린산, 루테올린이', 9.7], ['들어 있는 잎', 9.95]],
+  lab:   [['일본에선 면역 반응의 균형,', 13.2], ['TNF-α 조절 작용이 연구됐어요', 13.45]],
+  table: [['주스로, 밥에, 샐러드로.', 18.5], ['일본 식탁의 단골 잎', 18.8]],
+  end:   [['이제 깻잎과 헷갈리지 마세요', 22.7], ['몰랐던 건강 소재, 팔로우하고 더 알아가요', K.cap6b]],
 };
 
 // ---------- text registry (reading check) ----------
@@ -201,12 +201,12 @@ function plate(ctx, s, t) {
   overlay(ctx, s, t);
   // captions under the plate
   CAPS[s.id].forEach(([str, t0], i) => cut(ctx, `cap-${s.id}-${i}`, str, W / 2, 1668 + i * 76, t, t0, s.t1, { size: i && s.id === 'end' ? 40 : 54, weight: i && s.id === 'end' ? 600 : 700 }));
-  if (s.id === 'lab') cut(ctx, 'foot', '* 자소잎 추출물을 먹인 생쥐 실험 · Ueda 외, 1997 · 2002', W / 2, 1832, t, 14.3, s.t1, { size: 22, weight: 600, text: '* 생쥐 실험 · Ueda 외, 1997 · 2002' });
+  if (s.id === 'lab') cut(ctx, 'foot', '* 자소잎 추출물을 먹인 생쥐 실험 · Ueda 외, 1997 · 2002', W / 2, 1832, t, 13.6, s.t1, { size: 22, weight: 600, text: '* 생쥐 실험 · Ueda 외, 1997 · 2002' });
 }
 function overlay(ctx, s, t) {
   if (s.id === 'q' && t >= K.answer) {
     cut(ctx, 'a1', '깻잎', 300, 1060, t, K.answer, s.t1, { size: 72, chip: true });
-    cut(ctx, 'a2', '자소', 770, 1060, t, K.answer + .05, s.t1, { size: 72, chip: true, color: '#2f5d1e' });
+    cut(ctx, 'a2', '자소', 770, 1060, t, K.answer, s.t1, { size: 72, chip: true, color: '#2f5d1e' });
   }
   if (s.id === 'shiso') {
     const L = [['초밥 옆 그 잎', [530, 470], [180, 330], K.cut1[0]], ['우메보시의 붉은색', [870, 780], [770, 1000], K.cut1[1]]];
