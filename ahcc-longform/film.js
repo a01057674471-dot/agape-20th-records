@@ -21,7 +21,14 @@ const PT = [];          // the pencil's track: [t, tip] at every pre-render step
 const reg = (id, text, t0, t1, box) => { if (!TXT.some(x => x.id === id)) TXT.push({ id, text, t0, t1, box }); };
 const evOnce = new Set();
 const ev = (key, e) => { if (!evOnce.has(key)) { evOnce.add(key); EVS.push(e); } };
-export function texts(t) { return TXT.filter(x => t >= x.t0 && t <= x.t1); }
+// texts on screen at t, their world boxes mapped through the camera (for the reading check)
+export function texts(t) {
+  const c = camAt(t);
+  return TXT.filter(x => t >= x.t0 && t <= x.t1).map(x => {
+    const [bx, by, bw, bh] = x.box, p = E.w2s(c, bx, by), q = E.w2s(c, bx + bw, by + bh);
+    return { ...x, box: [p[0], p[1], q[0] - p[0], q[1] - p[1]] };
+  });
+}
 function track(tip, p, t) { if (p > 0 && p < 1 && tip) TIP = tip; }
 // handwriting: written on over `d` seconds from t0
 function hand(g, id, s, x, y, t, t0, o = {}) {
