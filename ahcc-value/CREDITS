@@ -1,0 +1,15 @@
+라파힐 AHCC — 30 s portrait ad, value cut, Swiss Motion Graphics style
+
+Copy and figures: see FACTS.md (every on-screen line with its place on the client's detail page).
+'라파힐', 'RAPHAHEAL', 'AHCC' and the product photograph belong to their owners. Product photo: cropped from the client's
+detail-page image (assets/product.jpg). The ticks and the twelve generic '면역' boxes are drawn here; no official mark or other brand is copied.
+
+Picture: drawn by code in this folder (film.js). ease.js is copied from the Lemo-Opuscar library's Swiss Motion demo (MIT licence).
+
+Font (SIL Open Font License 1.1; licence in fonts/): Noto Sans KR (Medium–Black; subset) — Google / Adobe.
+
+Music & sound: original composition and procedural print foley (audio/sound.py).
+  Drums: "MuldjordKit" by Lars Muldjord (drumgizmo.org), FreePats version, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
+  Bass: FreePats project (freepats.zenvoid.org), CC0 1.0
+  Marimba, vibraphone, glockenspiel: Versilian Community Sample Library (Versilian Studios), CC0 1.0
+  Timpani: VS Chamber Orchestra: Community Edition (Versilian Studios), CC0 1.0
