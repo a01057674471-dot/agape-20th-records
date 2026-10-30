@@ -1,0 +1,24 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>라파힐 AHCC</title>
+<style>
+@font-face { font-family: NotoKR; font-weight: 500; src: url(fonts/NotoSansKR-500.woff2) format('woff2'); }
+@font-face { font-family: NotoKR; font-weight: 600; src: url(fonts/NotoSansKR-600.woff2) format('woff2'); }
+@font-face { font-family: NotoKR; font-weight: 700; src: url(fonts/NotoSansKR-700.woff2) format('woff2'); }
+@font-face { font-family: NotoKR; font-weight: 800; src: url(fonts/NotoSansKR-800.woff2) format('woff2'); }
+@font-face { font-family: NotoKR; font-weight: 900; src: url(fonts/NotoSansKR-900.woff2) format('woff2'); }
+html, body { margin: 0; background: #F3F3F6; overflow: hidden; } canvas { display: block; }
+</style></head>
+<body><canvas id="c" width="1080" height="1920"></canvas>
+<script type="module">
+import * as F from './film.js';
+await Promise.all([500, 600, 700, 800, 900].map(w => document.fonts.load(`${w} 40px NotoKR`, '가나다 0123 ABC')));
+await F.load();
+const g = document.getElementById('c').getContext('2d');
+for (let t = 0; t < F.DUR; t += .125) F.render(g, t);      // registers every text once
+window.DUR = F.DUR;
+window.render = t => F.render(g, t);
+window.EV = F.events();
+window.TEXTS = t => F.texts(t).map(x => ({ id: x.id, text: x.text, x0: x.box[0], y0: x.box[1], x1: x.box[0] + x.box[2], y1: x.box[1] + x.box[3] }));
+window.READY = true;
+</script>
+</body></html>
