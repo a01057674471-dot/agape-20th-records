@@ -1,0 +1,5 @@
+out/
+stills/
+events.json
+audio/cues.json
+audio/*.wav
