@@ -134,7 +134,7 @@ function sceneThree(g, t, s) {
 const CRIT = {
   c1: { n: '01', title: ['식약처가 인정한', '기능성인가?'], ans: ['식약처 개별인정 제2008-78호', '면역기능 증진에 도움을 줄 수 있음'], cap: '기능성' },
   c2: { n: '02', title: ['사람에게서', '확인됐는가?'], ans: ['인체시험으로 확인', '수지상세포 증가 · NK세포 활성'], src: 'Nutrition and Cancer 2008 · Biotherapy 2000', cap: '인체시험' },
-  c3: { n: '03', title: ['오래 검증된', '원료인가?'], ans: ['AHCC 국내 최초 소개', '24년 정식 유통 · 국제학회 ICNIM'], cap: '검증' },
+  c3: { n: '03', title: ['오래 검증된', '원료인가?'], ans: ['오래된 데는 이유가 있다', '1980년대 개발 · 30년 넘는 연구'], cap: '검증' },
 };
 function sceneCrit(g, t, s) {
   const c = CRIT[s.id], st = K.stamp[s.id], F = fg(s), A = acc(s);
@@ -142,10 +142,10 @@ function sceneCrit(g, t, s) {
   numeral(g, 'cn' + s.id, c.n, M - 6, 470, 300, A, s.t0, s.t0 + BEAT, s.t1, c.n);
   say(g, 'ct' + s.id, c.title[0], M, 640, 110, 900, F, s.t0 + .2, s.t1, { text: c.title.join(' ') });
   say(g, 'cu' + s.id, c.title[1], M, 780, 110, 900, F, s.t0 + .35, s.t1);
-  if (s.id === 'c3') {      // the years, counted
-    const n = Math.round(24 * steps(t, st - 1.0, st - .25, 6));
-    if (t >= st - 1.0) { font(g, 900, 300); g.fillStyle = A; g.fillText(String(n), M - 10, 1120); font(g, 900, 90); g.fillStyle = F; g.fillText('년', M + (n >= 10 ? 340 : 180), 1120); }
-    reg('c3n', '24년', st - 1.0, s.t1, [M, 880, 600, 260]);
+  if (s.id === 'c3') {      // the years, counted up to "30년+" (AHCC was developed in Japan in the late 1980s: 1987 or 1989 by source)
+    const n = Math.round(30 * steps(t, st - 1.0, st - .25, 6));
+    if (t >= st - 1.0) { font(g, 900, 300); g.fillStyle = A; g.fillText(String(n), M - 10, 1120); font(g, 900, 90); g.fillStyle = F; g.fillText(n >= 30 ? '년+' : '년', M + (n >= 10 ? 340 : 180), 1120); }
+    reg('c3n', '30년+', st - 1.0, s.t1, [M, 880, 600, 260]);
   }
   // the answer panel
   const y = s.id === 'c3' ? 1200 : 960, p = snap(t, st - E8, E8 * 2);
@@ -160,7 +160,7 @@ function sceneCrit(g, t, s) {
 // 06 · 19.75–25.25: the verdict — three ticks, one name, the product, the three marks
 function sceneVerdict(g, t, s) {
   captions(g, 96, s.t0, s.t1, '결론', '06 / 07', '3가지 모두', C.ink);
-  ['식약처 인정 기능성', '인체시험 근거', '24년 검증 원료'].forEach((txt, i) => {
+  ['식약처 인정 기능성', '인체시험 근거', '30년 넘게 연구된 원료'].forEach((txt, i) => {
     const t0 = K.rows[i], y = 300 + i * 120;
     stamp(g, M + 40, y - 18, 38, t, t0, C.navy, C.paper);
     say(g, 'vr' + i, txt, M + 110, y, 60, 900, C.ink, t0, s.t1);
