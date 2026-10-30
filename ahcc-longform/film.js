@@ -50,7 +50,7 @@ const KEYS = [
   [at('l09') + .3, IMM[0], IMM[1] + 160, .88, 1.3], [at('l11'), IMM[0], IMM[1] + 60, .92, 1],
   [S.ahcc + 1.2, AH[0] - 560, AH[1] + 60, 1.25, 1.6], [at('l13') + .2, AH[0] - 380, AH[1] + 240, 1.05, 1.2], [at('l14'), AH[0] + 330, AH[1], 1.15, 1.2],
   [at('l15'), AH[0], AH[1] + 40, .9, 1.2],
-  [S.history + 1.2, HIST[0] - 500, HIST[1], 1.05, 1.6], [at('l18'), HIST[0], HIST[1], .85, 1.6], [at('l19'), HIST[0] + 380, HIST[1] - 60, 1.0, 1.2],
+  [S.history + 1.2, HIST[0] - 500, HIST[1], 1.05, 1.6], [at('l18'), HIST[0], HIST[1], .85, 1.6], [at('l19'), HIST[0], HIST[1] + 60, .85, 1.2],
   [S.korea + 1.2, KOR[0] - 200, KOR[1], 1.05, 1.6], [at('l21'), KOR[0] + 120, KOR[1] + 40, .95, 1.2], [at('l23'), KOR[0] + 80, KOR[1] + 240, 1.05, 1.2],
   [S.qa + 1.2, QA[0], QA[1] - 330, 1.1, 1.6], [at('l26'), QA[0], QA[1] - 160, 1.1, 1.0], [at('l27'), QA[0], QA[1] + 20, 1.1, 1.0],
   [at('l27b'), QA[0], QA[1] + 190, 1.1, 1.0], [at('l28'), QA[0], QA[1] + 330, 1.1, 1.0],
@@ -316,12 +316,14 @@ export function render(g, t, record = false) {
   if (record) { if (TIP) PT.push([t, TIP]); return; }      // the pre-pass only registers texts, sounds and the pencil's track
   pencil(g, t);
   // the caption: the narration line, word by word across its time
-  for (const id in V) {
-    const [t0, t1, text] = V[id];
-    if (t < t0 - .1 || t > t1 + .9) continue;
+  // one caption at a time: each holds until just before the next line begins
+  const ids = Object.keys(V);
+  ids.forEach((id, k) => {
+    const [t0, t1, text] = V[id], next = k + 1 < ids.length ? V[ids[k + 1]][0] : DUR, hold = Math.min(t1 + .6, next - .35);
+    if (t < t0 - .1 || t > hold + .3) return;
     const words = text.split(' '), n = words.length;
-    E.caption(g, words.map((w, i) => ({ w, t: t0 + (t1 - t0) * i / n })), t, { t0, t1: t1 + .6, x: 180, y: 1010, size: 38, maxW: 1560 });
-  }
+    E.caption(g, words.map((w, i) => ({ w, t: t0 + (t1 - t0) * i / n })), t, { t0, t1: hold, x: 180, y: 1010, size: 38, maxW: 1560 });
+  });
 }
 
 // sound events (the score reads these)
