@@ -1,23 +1,23 @@
 // 라파힐 AHCC — value cut. 30 s portrait ad, Swiss Motion Graphics, built only from the brand's detail page (FACTS.md).
 // The viewer gets a way to choose: three things to check in any immune product. The product then passes each one
 // (a stamp lands on every criterion), and the verdict puts all three on one card. Navy and paper cards alternate;
-// big type, beat-locked cuts and stamps carry the impact. Narration comes later.
+// big type, beat-locked cuts and stamps carry the impact. Cut to the user's narration (tools/voice.py → voices/times.js).
 import { lerp, snap, lin, steps, E8, E16, BEAT } from './ease.js';
+import { DUR as VDUR, CARD_T0, V } from './voices/times.js';
 
-export const W = 1080, H = 1920, DUR = 30;
+export const W = 1080, H = 1920, DUR = VDUR;
+const at = id => V[id][0];
 export const C = { page: '#F3F3F6', paper: '#FFFFFF', ink: '#111111', grid: '#D8D9E0', mute: '#6F7180', navy: '#2B2E8F', soft: '#AEB2E6', deep: '#1E2170' };
 const M = 72, CW = 136, GU = 24;
 const fx = i => M + i * (CW + GU);
 const FAM = 'NotoKR';
 
 // ---------- edit list (seconds) ----------
-export const SC = [
-  { id: 'hook', t0: 0, t1: 3.5, bg: 'navy' }, { id: 'three', t0: 3.5, t1: 6.5, bg: 'page' },
-  { id: 'c1', t0: 6.5, t1: 11.25, bg: 'navy' }, { id: 'c2', t0: 11.25, t1: 16.0, bg: 'page' }, { id: 'c3', t0: 16.0, t1: 20.75, bg: 'navy' },
-  { id: 'verdict', t0: 20.75, t1: 25.75, bg: 'page' }, { id: 'end', t0: 25.75, t1: 30, bg: 'navy' },
-];
-const at = id => SC.find(s => s.id === id);
-export const K = { stamp: { c1: 7.4, c2: 12.15, c3: 16.9 }, rows: [21.0, 21.3, 21.6], name: 22.1, marks: 21.5, cta: 26.3, note: 11.25 };
+const ORDER = [['hook', 'navy'], ['three', 'page'], ['c1', 'navy'], ['c2', 'page'], ['c3', 'navy'], ['verdict', 'page'], ['end', 'navy']];
+export const SC = ORDER.map(([id, bg], i) => ({ id, bg, t0: CARD_T0[id], t1: i + 1 < ORDER.length ? CARD_T0[ORDER[i + 1][0]] : DUR }));
+// every answer lands with its phrase: the stamp on the product's answer, the count during the question, the name on its word
+const VT = CARD_T0.verdict;
+export const K = { stamp: { c1: at('v06'), c2: at('v10'), c3: at('v13') }, rows: [VT + .05, VT + .2, VT + .35], name: at('v16') - .1, marks: VT + .2, cta: CARD_T0.end + .3, note: CARD_T0.c2 };
 
 // ---------- text ----------
 function font(g, wt, size) {
@@ -127,7 +127,7 @@ function sceneHook(g, t, s) {
 // 02 · 3.25–6: a giant 3
 function sceneThree(g, t, s) {
   numeral(g, 'n3', '3', M - 20, 1020, 820, C.navy, s.t0, s.t0 + BEAT, s.t1, '3');
-  say(g, 't1', '가지만 확인하세요', M, 1200, 104, 900, C.ink, s.t0 + .1, s.t1);
+  say(g, 't1', '가지만 확인하세요', M, 1200, 104, 900, C.ink, s.t0, s.t1);
   captions(g, 96, s.t0, s.t1, '고르는 기준', '02 / 07', '3가지', C.ink);
 }
 // 03–05: one criterion per card: the criterion, then the product's answer with a stamp
@@ -165,11 +165,10 @@ function sceneVerdict(g, t, s) {
     stamp(g, M + 40, y - 18, 38, t, t0, C.navy, C.paper);
     say(g, 'vr' + i, txt, M + 110, y, 60, 900, C.ink, t0, s.t1);
   });
-  say(g, 'vn', '3가지 모두,', M, 800, 72, 900, C.mute, K.name - .2, s.t1, { text: '3가지 모두, 라파힐 AHCC' });
+  say(g, 'vn', '3가지 모두,', M, 800, 72, 900, C.mute, s.t0 + .05, s.t1, { text: '3가지 모두, 라파힐 AHCC' });
   say(g, 'vn2', '라파힐 AHCC', M, 950, 150, 900, C.navy, K.name, s.t1);
   const p = snap(t, K.name + E8 * 2, E8 * 2);
   g.save(); g.beginPath(); g.rect(0, 1010, W, 440 * p); g.clip(); product(g, 1030, 860); g.restore();
-  say(g, 'vm', '건강기능식품 · 식품이력추적관리 · GMP', M, 660, 40, 700, C.navy, K.marks, s.t1);
 }
 // 07 · 25.25–30: the value line and the call to action
 function sceneEnd(g, t, s) {
@@ -204,7 +203,7 @@ export function texts(t) { return TXT.filter(x => t >= x.t0 && t <= x.t1); }
 export function events() {
   const ev = SC.map((s, i) => ({ t: s.t0, type: i ? 'cut' : 'start', i, bg: s.bg }));
   for (let i = 0; i < 12; i++) ev.push({ t: .1 + i * E16 * .5 + E16, type: 'tick' });
-  [.25, .5, .75, 1].forEach(u => ev.push({ t: 3.5 + BEAT * u, type: 'thunk' }));
+  [.25, .5, .75, 1].forEach(u => ev.push({ t: CARD_T0.three + BEAT * u, type: 'thunk' }));
   Object.values(K.stamp).forEach(t => ev.push({ t: t + E8 * 2, type: 'stampHit' }, { t: t - E8, type: 'slide' }));
   for (let k = 1; k <= 6; k++) ev.push({ t: lerp(K.stamp.c3 - 1.0, K.stamp.c3 - .25, k / 6), type: 'thunk' });
   K.rows.forEach(t => ev.push({ t, type: 'stampSmall' }));

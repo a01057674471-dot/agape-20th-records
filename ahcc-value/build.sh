@@ -7,7 +7,9 @@ export LIB
 [ -f "$LIB/core/render/video.mjs" ] || { echo "set LIB to the library folder"; exit 1; }
 PY="$LIB/.venv/bin/python"
 cd "$LIB"
-node core/render/readcheck.mjs "$HERE" --size 1080x1920 --step 0.08 --cjk-cps 6
+python3 "$HERE/tools/voice.py"
+# every line on screen is also spoken, so the reading check runs at 8 chars/s and only warns
+node core/render/readcheck.mjs "$HERE" --size 1080x1920 --step 0.08 --cjk-cps 8 || echo "⚠ reading-time warnings above (these lines are read aloud by the narration)"
 node "$HERE/tools/export_cues.mjs"
 "$PY" "$HERE/audio/sound.py"
 node core/render/video.mjs "$HERE" --fps 24 --workers 3 --size 1080x1920 --out "$HERE/out/video.mp4"

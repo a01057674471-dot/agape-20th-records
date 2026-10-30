@@ -8,8 +8,5 @@ Picture: drawn by code in this folder (film.js). ease.js is copied from the Lemo
 
 Font (SIL Open Font License 1.1; licence in fonts/): Noto Sans KR (Medium–Black; subset) — Google / Adobe.
 
-Music & sound: original composition and procedural print foley (audio/sound.py).
-  Drums: "MuldjordKit" by Lars Muldjord (drumgizmo.org), FreePats version, licensed under CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/)
-  Bass: FreePats project (freepats.zenvoid.org), CC0 1.0
-  Marimba, vibraphone, glockenspiel: Versilian Community Sample Library (Versilian Studios), CC0 1.0
-  Timpani: VS Chamber Orchestra: Community Edition (Versilian Studios), CC0 1.0
+Narration: the client's own recording (voices/source.mp3), cut at its pauses and sped up 1.12× (tools/voice.py).
+Sound: procedural print foley (audio/sound.py), no music (the client adds their own).
