@@ -124,8 +124,8 @@ function immune(g, t) {
   reg('ly', '림프구 20~40개', end('l05') - .3, S.ahcc, [WX + 690, ly0, 300, 60]);
   hand(g, 'ne', '호중구 40~60개 · 세균과 맞섬', WX + 690, WY + 110, t, at('l05b') + .3, { size: 34, color: P.inkSoft });
   hand(g, 'mo', '단핵구 2~8개 · 청소 담당', WX + 690, cellXY(92)[1] + 10, t, at('l05b') + 1.6, { size: 34, color: P.inkSoft });
-  type(g, '정상 범위: MedlinePlus · 그림은 범위 안의 한 사람 예시', WX, WY - 52, t, at('l05b'), { size: 18 });
-  reg('src1', '정상 범위: MedlinePlus · 그림은 범위 안의 한 사람 예시', at('l05b'), S.ahcc, [WX, WY - 70, 600, 24]);
+  type(g, '정상 범위: MedlinePlus · 그림은 범위 안의 한 사람 예시', WX, WY - 52, t, at('l05') + .8, { size: 18 });
+  reg('src1', '정상 범위: MedlinePlus · 그림은 범위 안의 한 사람 예시', at('l05') + .8, S.ahcc, [WX, WY - 70, 600, 24]);
   // NK
   NK.forEach((i, k) => { const [cx, cy] = cellXY(i); line(g, 'nk' + k, E.ringPath(cx, cy, 30, k + 2), t, at('l06') + .8 + k * .2, .35, { color: P.red, width: 1.8 }); });
   hand(g, 'nk', 'NK세포 · 림프구의 약 3~14%', WX + 690, (ly0 + ly1) / 2 + 80, t, at('l07') + .2, { size: 40, color: P.red });
