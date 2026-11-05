@@ -1,0 +1,7 @@
+「あなたが隠れている場所まで」 — third-party assets
+
+- Font: Noto Serif JP (Google Fonts), SIL Open Font License 1.1 — subset to the characters used (fonts/).
+- Brush stroke engine (engine.js) and paper generator (tools/paper.py): adapted from the Lemo-Opuscar library's Watercolor Brush style.
+- Bible text: John 3:16, Japanese Colloquial Version (口語訳, 1955).
+- Narration: recorded and supplied by the film's owner.
+- No music or sound effects.
