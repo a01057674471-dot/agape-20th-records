@@ -16,7 +16,8 @@ mkdir -p out
 python3 -c "
 import json
 d=json.load(open('cues.json'))
-json.dump([{'t0':l['t0'],'t1':max(l['t1']+.4,l['t0']+1.8),'text':l['text'].replace(chr(10),' ')} for l in d['lines']],open('out/subs.json','w'),ensure_ascii=False)"
+L=d['lines']
+json.dump([{'t0':l['t0'],'t1':min(max(l['t1']+.4,l['t0']+1.8),L[k+1]['t0']-.12 if k+1<len(L) else 1e9),'text':l['text'].replace(chr(10),' ')} for k,l in enumerate(L)],open('out/subs.json','w'),ensure_ascii=False)"
 $PY $LIB/core/render/srt.py out/subs.json gospel-jp.srt
 DUR=$(python3 -c "import json;print(json.load(open('cues.json'))['dur'])")
 if [ -n "$1" ]; then
