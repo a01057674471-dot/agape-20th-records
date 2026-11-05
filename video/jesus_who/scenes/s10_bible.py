@@ -1,0 +1,40 @@
+"""④ the Bible: a closed book on a sunny wooden table, 「聖書」 in gold on the cover, a plant and a mug beside it."""
+from common import *
+
+def main(out, stages=None):
+    g, p = canvas(1010, tone='#e8a868', stages=stages)
+    wall = (p.YY < 900).astype(np.float32)
+    g.block_in(wall, '#cfe4e0', angle=0, length=(60, 120), width=(16, 26))
+    g.model_form(wall, ramp('#cfe4e0', light=0.15, pale=0.3), steps=3, relief=0.1, height=np.zeros_like(wall), angle=0)
+    win = g.poly([(160, 140), (920, 140), (920, 760), (160, 760)], smooth=False)
+    g.block_in(win, '#a8dcf0', length=(30, 60), width=(10, 18))
+    cloud(g, 400, 330, 0.8, seed=2); sun(g, 780, 260, 60, '#fff2a8')
+    olive_tree(g, 620, 760, 0.9, seed=3)
+    for x in (160, 540, 920): g.line([(x, 140), (x, 760)], 22, '#f8f2e6', 1.0, taper=(0, 0))
+    for y in (140, 450, 760): g.line([(160, y), (920, y)], 22, '#f8f2e6', 1.0, taper=(0, 0))
+    table = (p.YY >= 900).astype(np.float32)
+    g.block_in(table, '#c08a58', angle=0, length=(80, 140), width=(14, 24))
+    g.model_form(table, ['#7a4a2a', '#9a6a40', '#c08a58', '#d8a874', '#ecc898'], steps=3, relief=0.15, height=np.zeros_like(table), angle=0)
+    for k in range(12): g.line([(0, 940 + k * 84), (1080, 946 + k * 84)], 2.4, '#8a5a34', 0.4)
+    g.glaze(g.poly([(200, 900), (700, 900), (1000, 1920), (300, 1920)]), '#fff2c8', 0.3, mode='screen', soft=40)   # window light
+    g.stage('room')
+    cover = g.poly([(250, 1130), (800, 1060), (900, 1500), (330, 1600)], smooth=False)
+    pages = g.poly([(330, 1600), (900, 1500), (902, 1540), (334, 1640)], smooth=False)
+    g.cast_shadow(np.maximum(cover, pages), 24, 30, soft=24, alpha=0.4, colour='#5a3020')
+    g.block_in(pages, '#f6ecd4', angle=-10, length=(20, 40), width=(4, 6))
+    for k in range(6): g.line([(334, 1606 + k * 6), (900, 1506 + k * 6)], 1.4, '#c8b898', 0.6)
+    g.block_in(cover, '#2f5a4a', angle=-8, length=(40, 90), width=(12, 22))
+    g.model_form(cover, ['#183a30', '#24483c', '#2f5a4a', '#4a7a66', '#6a9a84'], steps=3, relief=0.25, angle=-8)
+    g.line([(280, 1150), (790, 1084), (880, 1480), (346, 1574), (280, 1150)], 4, '#d8b860', 0.85, taper=(0, 0))
+    paint_text(g, '聖書', 580, 1330, 140, '#e8c870', weight=900)
+    g.glaze(paint_text(g, '聖書', 576, 1326, 140, '#fff0b0', alpha=0.0, weight=900), '#fff0b0', 0.35, mode='screen')
+    # plant and mug
+    pot = g.poly([(820, 980), (980, 980), (960, 1120), (840, 1120)])
+    g.block_in(pot, '#d0704a', angle=90); g.model_form(pot, ramp('#d0704a'), steps=3, relief=0.6)
+    for a in (-60, -80, -100, -120, -140):
+        rad = np.deg2rad(a)
+        lf = g.blob(900 + np.cos(rad) * 80, 980 + np.sin(rad) * 80, 26, 50, 0.1, int(-a), a + 90)
+        g.block_in(lf, '#5a9a4a', length=(8, 16), width=(4, 8)); g.model_form(lf, ['#2f6a34', '#3f8a40', '#5a9a4a', '#8cc070', '#b8e090'], steps=3, relief=0.6)
+    cup(g, 160, 1120, 2.0, '#f2e6d0')
+    g.line([(110, 1080), (90, 1030), (115, 980)], 5, '#ffffff', 0.5, dry=0.4); g.line([(170, 1070), (150, 1010), (172, 960)], 5, '#ffffff', 0.5, dry=0.4)
+    finish(g, out, stages)
