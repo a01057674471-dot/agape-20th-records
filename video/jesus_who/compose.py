@@ -218,6 +218,8 @@ def view(im, z, cx, cy):
 
 def frame_of(shot, t, T):
     name, (z0, x0, y0), (z1, x1, y1) = shot
+    z1 = z0 + max(-0.03 * z0, min(0.03 * z0, z1 - z0))   # gentle drift only: at most 3% zoom
+    x1, y1 = x0 + (x1 - x0) * 0.3, y0 + (y1 - y0) * 0.3
     u = smooth(min(t / T, 1.0))
     z, cx, cy = z0 + (z1 - z0) * u, x0 + (x1 - x0) * u, y0 + (y1 - y0) * u
     im = src(name)
@@ -254,7 +256,7 @@ def block_durations():
 def build_timeline():
     tl, t = [], 0.0
     for (lines, shots, ex), d in block_durations():
-        n = min(len(shots), max(1, int(d / 1.15)))
+        n = min(len(shots), max(1, int(d / 2.3)))
         shots = shots[:n]
         for i, sh in enumerate(shots):
             tl.append(dict(t0=t + d * i / n, t1=t + d * (i + 1) / n, shot=sh, lines=lines, ex=ex, bt0=t, bt1=t + d))
@@ -280,7 +282,7 @@ def main():
     if preview:
         os.makedirs(f'{HERE}/preview', exist_ok=True)
     proc = None if preview else subprocess.Popen(cmd, stdin=subprocess.PIPE)
-    XF = 5                                            # frames of the quick cross-dissolve + punch-in at each cut
+    XF = 9                                            # frames of the quick cross-dissolve + punch-in at each cut
     si = 0
     prev_last = None
     for fi in range(nfr):
@@ -292,7 +294,7 @@ def main():
         name = s['shot'][0]
         sh = s['shot']
         # punch-in: a fast extra 6% zoom easing out over the first 8 frames
-        pz = 1 + 0.06 * (1 - ease(min(lt * FPS / 8, 1)))
+        pz = 1.0                                   # no punch-in at cuts (calmer)
         sh2 = (sh[0], (sh[1][0] * pz, sh[1][1], sh[1][2]), sh[2])
         im = frame_of(sh2, lt, T)
         fcut = int(round(lt * FPS))
