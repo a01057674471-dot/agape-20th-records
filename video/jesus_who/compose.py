@@ -229,11 +229,33 @@ def frame_of(shot, t, T):
     return view(im, z, cx, cy)
 
 
+LEAD = 2.5          # the title paints itself on before the voice starts
+
+
+def block_durations():
+    """with --audio: each spoken block lasts as long as it does in the recording (audio/align.json), after a short
+    lead-in; without: an estimated calm narration pace"""
+    if '--audio' not in sys.argv:
+        return [(b, dur_of(b[0], b[2])) for b in BLOCKS]
+    al = json.load(open(os.path.join(HERE, 'audio', 'align.json')))
+    segs = iter(al['segs'])
+    out = [(([], [S('build:s01', 1.0)], dict(title=True)), LEAD)]
+    for i, b in enumerate(BLOCKS):
+        if b[0]:
+            a, e = next(segs)
+            if i == 0: a = 0.0                                # the first block starts with the voice
+            sh = [S('s01', 1.0, (0.5, 0.5), 1.06)] if i == 0 else b[1]
+            out.append(((b[0], sh, {k: v for k, v in b[2].items() if k != 'min'}), e - a))
+        else:
+            out.append((b, b[2].get('min', 7.0)))
+    return out
+
+
 def build_timeline():
     tl, t = [], 0.0
-    for lines, shots, ex in BLOCKS:
-        d = dur_of(lines, ex)
-        n = len(shots)
+    for (lines, shots, ex), d in block_durations():
+        n = min(len(shots), max(1, int(d / 1.15)))
+        shots = shots[:n]
         for i, sh in enumerate(shots):
             tl.append(dict(t0=t + d * i / n, t1=t + d * (i + 1) / n, shot=sh, lines=lines, ex=ex, bt0=t, bt1=t + d))
         t += d
@@ -309,6 +331,12 @@ def main():
         if fi % 300 == 0: print(f'{fi}/{nfr}', flush=True)
     if proc:
         proc.stdin.close(); proc.wait()
+    if '--audio' in sys.argv and not preview:
+        tmp = out.replace('.mp4', '_noaudio.mp4'); os.replace(out, tmp)
+        subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-i', tmp, '-i', os.path.join(HERE, 'audio', 'narration.mp3'),
+                        '-filter_complex', f'[1:a]adelay={int(LEAD * 1000)}:all=1,apad[a]', '-map', '0:v', '-map', '[a]',
+                        '-c:v', 'copy', '-c:a', 'aac', '-b:a', '192k', '-shortest', '-movflags', '+faststart', out], check=True)
+        os.remove(tmp)
     print('done', out)
 
 

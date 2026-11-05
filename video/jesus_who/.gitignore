@@ -5,3 +5,5 @@ preview/
 *.log
 scenes/__pycache__/
 __pycache__/
+audio/*.mp3
+audio/*.f32
