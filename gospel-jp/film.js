@@ -443,9 +443,9 @@ function setup() {
 const BUF = [0, 1].map(() => { const b = document.createElement('canvas'); b.width = W; b.height = H; return b.getContext('2d'); });
 function drawScene(c, s, t) { c.save(); s.draw.call(s, c, t - s.t0, s.A, s.E); c.restore(); reset(c); c.globalAlpha = 1; }
 function subs(t) {
-  for (const l of LN) {
+  for (const [k, l] of LN.entries()) {
     if (l.cue === 6) continue;
-    const t1 = Math.max(l.t1 + .4, l.t0 + 1.8), a = ss(seg(t, l.t0 - .15, l.t0 + .15)) * (1 - ss(seg(t, t1 - .2, t1 + .1)));
+    const nx = k + 1 < LN.length ? LN[k + 1].t0 - .12 : 1e9, t1 = Math.min(Math.max(l.t1 + .4, l.t0 + 1.8), nx), a = ss(seg(t, l.t0 - .15, l.t0 + .15)) * (1 - ss(seg(t, t1 - .2, t1 + .1)));
     if (a <= 0) continue;
     ctx.save(); reset(ctx); ctx.font = `500 44px ${JP}`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     const tw = ctx.measureText(l.text).width; ctx.save(); ctx.translate(W / 2, H - 86); ctx.scale((tw + 260) / 2 / 70, 1);
