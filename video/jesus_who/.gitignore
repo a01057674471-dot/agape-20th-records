@@ -4,3 +4,4 @@ preview/
 *.mp4
 *.log
 scenes/__pycache__/
+__pycache__/
