@@ -1,0 +1,8 @@
+out/
+preview/
+*.mp4
+*.log
+__pycache__/
+scenes/__pycache__/
+audio/*.mp3
+fonts

@@ -1,0 +1,13 @@
+a_chapel
+b1_necklace
+b2_church
+c_golgotha
+d_wonder
+e_bible
+f_cross
+g_city
+h_tomb
+i_bloom
+j_umbrella
+k_rings
+l_end
