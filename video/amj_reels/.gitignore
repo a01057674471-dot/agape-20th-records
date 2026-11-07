@@ -1,0 +1,10 @@
+out/
+preview/
+photos/
+art/
+fonts/
+audio/*.mp3
+*.mp4
+*.log
+__pycache__/
+art_src/__pycache__/
