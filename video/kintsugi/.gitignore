@@ -1,5 +1,7 @@
 art/*.jpg
 art/*.log
+art/*.png
+art/*.npz
 preview/
 *.mp4
 audio/*.mp3

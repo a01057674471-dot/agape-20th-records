@@ -1,6 +1,8 @@
 """Edit the kintsugi reel 「割れたままで、美しい」 (9:16), timed to the recorded narration (audio/align.json).
 Blue picture-book paintings; the only warm colour is gold, and the gold seams are drawn on in the edit along the
-painted cracks (art/cracks_*.json): first on the bowl, at the end over her heart. No music or effects.
+breaks of one hero bowl (art/bowl.png + bowl_meta.npz, see art_src/bowl_asset.py): it falls and breaks, is put
+back together, and the gold flows along every break; at the end the same gold mends a small break over her heart.
+No music or effects.
 python3 compose.py out.mp4 [--preview]
 """
 import os, sys, json, subprocess, glob
@@ -14,49 +16,72 @@ W, H, FPS = 1080, 1920, 30
 F = lambda w, s: ImageFont.truetype(os.path.join(HERE, 'fonts', f'ZenMaruGothic-{w}.ttf'), s)
 NAVY = (29, 52, 80); PAPER = (251, 250, 245); GOLD = (217, 164, 58); GOLD_HI = (255, 240, 176); GOLD_GLOW = (242, 212, 136)
 END_HOLD = 5.0
-CRACKS = {}
-for f in glob.glob(os.path.join(ART, 'cracks_*.json')):
-    CRACKS.update(json.load(open(f)))
+sys.path.insert(0, os.path.join(HERE, 'art_src'))
+import goldfx
 
 
 def smooth(u): u = min(max(u, 0.0), 1.0); return u * u * (3 - 2 * u)
+def ease_in(u): u = min(max(u, 0.0), 1.0); return u * u
+def ease_out(u): u = min(max(u, 0.0), 1.0); return 1 - (1 - u) ** 3
 def layer(): return Image.new('RGBA', (W, H), (0, 0, 0, 0))
 
 
-# ---------------------------------------------------------------- the gold seams
-def resample(path, step=3.0):
-    P = np.asarray(path, np.float32)
-    seg = np.hypot(*np.diff(P, axis=0).T); s = np.concatenate([[0], np.cumsum(seg)])
-    n = max(2, int(s[-1] / step) + 1); ss = np.linspace(0, s[-1], n)
-    return np.stack([np.interp(ss, s, P[:, 0]), np.interp(ss, s, P[:, 1])], 1)
+# ---------------------------------------------------------------- the hero bowl in each shot
+ANCHOR = (540.0, 557.0)                         # visual centre of the bowl on its 1080 canvas
+_scaled = {}
+def bowl_at(u, scale, cracks=True):
+    key = (round(u, 3), round(scale, 3), cracks)
+    if key not in _scaled:
+        im = goldfx.bowl_image(u, cracks)
+        _scaled[key] = im.resize((int(1080 * scale), int(1080 * scale)), Image.LANCZOS)
+        if len(_scaled) > 400: _scaled.pop(next(iter(_scaled)))
+    return _scaled[key]
 
 
-def gold_layer(paths, u, width=7.0, stagger=0.25):
-    """gold seams drawn up to fraction u (0..1); paths start one after another (stagger) and grow along their length"""
-    if u <= 0: return None
-    SS = 2
-    big = Image.new('RGBA', (W * SS, H * SS), (0, 0, 0, 0)); d = ImageDraw.Draw(big)
-    glow = Image.new('RGBA', (W * SS, H * SS), (0, 0, 0, 0)); g = ImageDraw.Draw(glow)
-    n = len(paths)
-    for k, p in enumerate(paths):
-        a = k * stagger / max(n - 1, 1)
-        v = smooth((u - a) / (1 - stagger)) if n > 1 else smooth(u)
-        if v <= 0: continue
-        Q = resample(p)
-        m = max(2, int(len(Q) * v))
-        Q = Q[:m] * SS
-        rr = np.random.default_rng(k)
-        wob = rr.normal(0, 0.6, Q.shape) * SS
-        pts = [tuple(q) for q in (Q + wob)]
-        g.line(pts, fill=GOLD_GLOW + (150,), width=int(width * 3.2 * SS), joint='curve')
-        d.line(pts, fill=GOLD + (255,), width=int(width * SS), joint='curve')
-        d.line([(x - 1.2 * SS, y - 1.2 * SS) for x, y in pts], fill=GOLD_HI + (235,), width=int(width * 0.32 * SS), joint='curve')
-        tip = Q[-1]
-        if v < 1:                                         # a bright spark at the growing tip
-            r = 7 * SS; g.ellipse((tip[0] - r * 2, tip[1] - r * 2, tip[0] + r * 2, tip[1] + r * 2), fill=GOLD_HI + (180,))
-    glow = glow.filter(ImageFilter.GaussianBlur(9 * SS))
-    out = Image.alpha_composite(glow, big).resize((W, H), Image.LANCZOS)
-    return out
+def paste_bowl(base, im, cx, cy, scale):
+    base.alpha_composite(im, (int(cx - ANCHOR[0] * scale), int(cy - ANCHOR[1] * scale)))
+
+
+_shards = None
+def shards(scale):
+    """the bowl cut into its shards (with their dark break lines), each with its centroid"""
+    global _shards
+    if _shards is None or _shards[0] != scale:
+        B = goldfx.bowl(); lab = B['meta']['shard']
+        full = goldfx.bowl_image(0.0, True)
+        arr = np.asarray(full)
+        out = []
+        for l in range(1, lab.max() + 1):
+            m = lab == l
+            if m.sum() < 50: continue
+            a = arr.copy(); a[..., 3] = (a[..., 3] * m).astype(np.uint8)
+            ys, xs = np.nonzero(m)
+            im = Image.fromarray(a, 'RGBA').resize((int(1080 * scale), int(1080 * scale)), Image.LANCZOS)
+            out.append((im, xs.mean(), ys.mean(), l))
+        _shards = (scale, out)
+    return _shards[1]
+
+
+def broken_bowl(base, cx, cy, scale, k):
+    """the bowl split into shards, pushed apart by k (0 = whole, 1 = fully apart)"""
+    for (im, sx, sy, l) in shards(scale):
+        vx, vy = sx - ANCHOR[0], sy - ANCHOR[1] - 60
+        n = max(np.hypot(vx, vy), 1)
+        rr = np.random.default_rng(l)
+        off = 34 * k
+        dx, dy = vx / n * off + rr.uniform(-6, 6) * k, vy / n * off * 0.6 + 18 * k
+        rot = rr.uniform(-7, 7) * k
+        piece = im.rotate(rot, resample=Image.BICUBIC, center=(sx * scale, sy * scale)) if abs(rot) > 0.05 else im
+        base.alpha_composite(piece, (int(cx - ANCHOR[0] * scale + dx), int(cy - ANCHOR[1] * scale + dy)))
+
+
+HEARTS = {}
+def heart(name):
+    if name not in HEARTS:
+        z = np.load(os.path.join(ART, f'coat_{name}.npz'))
+        cx, cy = z['heart']
+        HEARTS[name] = goldfx.heart_seams(z['coat'].astype(np.float32), float(cx), float(cy), r=92, seed=hash(name) % 1000)
+    return HEARTS[name]
 
 
 # ---------------------------------------------------------------- text
@@ -132,6 +157,9 @@ SPLIT = {0: ['大切なお茶碗が、', '割れてしまったら。'], 2: ['�
 
 def main():
     out = sys.argv[1]; preview = '--preview' in sys.argv
+    only = None
+    if '--frames' in sys.argv:                         # full-size stills at the given times, for checking
+        only = {int(float(x) * 30) for x in sys.argv[sys.argv.index('--frames') + 1].split(',')}; preview = True
     al = json.load(open(os.path.join(HERE, 'audio', 'align.json')))
     seg0 = [0.0] + [s[1] for s in al['segs'][:-1]] + [al['total']]
     total = al['total'] + END_HOLD
@@ -147,30 +175,40 @@ def main():
             (L(12), L(14), chip_layer('ペテロの手紙 第一 2章24節', 250)),
             (L(14) + 0.1, L(16) + 0.2, caption_layer('割れたままで、\n来ていい。', 240, 86))]
     endl = end_layer()
-    # gold: the bowl in C (grows over lines 4-5), the bowl in H (already mended), her heart in H (grows over line 16),
-    # the end bowl (complete)
-    gold_c = [(L(4) + 0.3, L(6) - 0.6, CRACKS['c'], 8.0)]
-    gold_h = [(L(14) - 0.01, L(14), CRACKS['h_bowl'], 5.0), (L(16) - 0.2, seg0[-1] - 0.3, CRACKS['h'], 6.0)]
-    gold_i = [(seg0[-1] - 0.01, seg0[-1], CRACKS['i'], 7.0)]
-    GOLD_BY = {'c_bowl': gold_c, 'h_dawn': gold_h, 'i_end': gold_i}
-    gcache = {}
+    T_IMPACT = 1.45
+    pale = (214, 228, 241)
 
-    def gold_for(img, t):
-        outl = []
-        for (a, e, paths, w) in GOLD_BY.get(img, []):
-            u = smooth((t - a) / max(e - a, 1e-3)) if e - a > 0.05 else (1.0 if t >= a else 0.0)
-            u = round(u, 3)
-            key = (img, a, u)
-            if key not in gcache:
-                gcache[key] = gold_layer(paths, u, w, stagger=0.35)
-            if gcache[key] is not None: outl.append(gcache[key])
-        return outl
+    def overlays(img, base, t):
+        if img == 'a_drop':                              # it slips, falls, and breaks on the table
+            sc, x, y0, y1 = 0.62, 540, 900, 1083
+            if t < T_IMPACT:
+                y = y0 + (y1 - y0) * ease_in((t - 0.35) / (T_IMPACT - 0.35)) if t > 0.35 else y0
+                paste_bowl(base, bowl_at(0.0, sc, cracks=False), x, y, sc)
+            else:
+                broken_bowl(base, x, y1, sc, ease_out((t - T_IMPACT) / 0.4))
+        elif img == 'b_craft':                           # the pieces back together; gilding begins under the brush
+            u = 0.22 * smooth((t - L(2) - 0.6) / (L(4) - L(2) - 0.8))
+            paste_bowl(base, bowl_at(u, 0.6), 540, 1009, 0.6)
+        elif img == 'c_bowl':                            # the gold flows along every break
+            u = 0.22 + 0.78 * smooth((t - L(4) - 0.2) / (L(6) - L(4) - 0.7))
+            paste_bowl(base, bowl_at(u, 0.95), 540, 1074, 0.95)
+        elif img in ('d_train', 'e_night'):
+            base.alpha_composite(heart(img[0]).dark(pale, 0.85 if img == 'e_night' else 0.6))
+        elif img == 'h_dawn':
+            paste_bowl(base, bowl_at(1.0, 0.36), 720, 1327, 0.36)
+            hs = heart('h')
+            u = smooth((t - L(16) + 0.1) / (seg0[-1] - L(16) - 0.2))
+            if u < 1: base.alpha_composite(hs.dark(pale, 0.85 * (1 - u)))
+            g = hs.gold(u)
+            if g is not None: base.alpha_composite(g)
+        elif img == 'i_end':
+            paste_bowl(base, bowl_at(1.0, 0.66), 540, 1230, 0.66)
 
     def picture(s, t):
         u = smooth((t - s['t0']) / max(s['t1'] - s['t0'], 1e-3))
         z = s['z0'] + (s['z1'] - s['z0']) * u
         base = imgs[s['img']].convert('RGBA')
-        for gl in gold_for(s['img'], t): base.alpha_composite(gl)
+        overlays(s['img'], base, t)
         return view(base, z, *s['c'])
 
     XF = 0.4
@@ -183,7 +221,9 @@ def main():
     if preview: os.makedirs(os.path.join(HERE, 'preview'), exist_ok=True)
     for fi in range(nfr):
         t = fi / FPS
-        if preview and fi % 15: continue
+        if only is not None:
+            if fi not in only: continue
+        elif preview and fi % 15: continue
         k = max(i for i, s in enumerate(tl) if s['t0'] <= t + 1e-6)
         s = tl[k]
         im = picture(s, t)
@@ -202,7 +242,8 @@ def main():
             i = max(i for i in range(len(LINES)) if seg0[i] <= t + 1e-6)
             if i in subs: im.alpha_composite(subs[i])
         rgb = im.convert('RGB')
-        if preview: rgb.resize((360, 640)).save(os.path.join(HERE, 'preview', f'{fi:05d}.jpg'), quality=80)
+        if only is not None: rgb.save(os.path.join(HERE, 'preview', f'full_{fi:05d}.jpg'), quality=90)
+        elif preview: rgb.resize((360, 640)).save(os.path.join(HERE, 'preview', f'{fi:05d}.jpg'), quality=80)
         else: proc.stdin.write(rgb.tobytes())
     if proc: proc.stdin.close(); proc.wait()
     print('done', out, f'{total:.1f}s')

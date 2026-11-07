@@ -19,27 +19,10 @@ def a_drop():
     b = page(2101)
     b.block((40, 50, 1040, 1870), 'powder', rough=10, corner=30, seed=11)
     table(b, 1240)
-    # pieces of the broken bowl on the table, scattered
-    pieces = [b.poly([(360, 1300), (520, 1290), (500, 1390), (380, 1400)]), b.poly([(540, 1310), (700, 1300), (690, 1420), (560, 1400)]),
-              b.poly([(300, 1420), (420, 1410), (410, 1480), (290, 1470)]), b.poly([(720, 1430), (820, 1420), (830, 1480), (720, 1490)])]
-    for k, pc in enumerate(pieces):
-        b.fill(pc, 'cornflower', pressure=0.95, angle=80, seed=20 + k)
-        b.fill(pc * (YY > 1380), 'deep', pressure=0.7, slip=0, seed=25 + k)
-    for k, (x, y) in enumerate(((620, 1250), (460, 1270), (780, 1380), (260, 1380), (880, 1460))):
-        b.dot(x, y, 6 + k % 3 * 2, colour='cornflower', medium='gouache')
     hand(b, 560, 760, 2.0, 120, SKIN, spread=10, curl=0.1)
     sleeve = b.band([(900, 380), (700, 600), (600, 700)], 230, 190)
     b.fill(sleeve, 'navy', pressure=0.95, angle=-40, seed=30)
     b.stage('blue')
-    for pc in ([(360, 1300), (520, 1290), (500, 1390), (380, 1400)], [(540, 1310), (700, 1300), (690, 1420), (560, 1400)],
-               [(300, 1420), (420, 1410), (410, 1480), (290, 1470)], [(720, 1430), (820, 1420), (830, 1480), (720, 1490)]):
-        b.outline(pc, 4.0, smooth=False, seed=int(pc[0][0]))
-    for k in range(7):                                 # little motion lines of the fall
-        x = 470 + k * 30
-        b.ink([(x, 1000 + k % 2 * 20), (x + 6, 1120)], 2.4, colour='slate', dry=0.4, seed=40 + k)
-    for a in range(9):                                 # the crack 'burst'
-        t = np.deg2rad(200 + a * 18)
-        b.ink([(540 + np.cos(t) * 90, 1330 + np.sin(t) * 50), (540 + np.cos(t) * 160, 1330 + np.sin(t) * 90)], 3, seed=50 + a)
     b.outline([(900, 380), (700, 600), (600, 700)], 4, closed=False, seed=51)
     b.speckle((60, 60, 1020, 1860), 'chalk', n=600, size=(0.5, 1.3), seed=52)
     finish(b, os.path.join(ART, 'a_drop.jpg'))
@@ -50,9 +33,6 @@ def b_craft():
     b = page(2102)
     b.block((40, 50, 1040, 1870), 'mist', rough=10, corner=30, seed=11)
     table(b, 1160)
-    cr = crack_paths(540, 900, 520, 360, seed=3, n=3)
-    bowl(b, 540, 900, 520, 360, cracks=cr, seed=60)
-    CR['b'] = cr
     # tools: lacquer jar, gold powder dish, brushes
     jar = b.poly([(150, 1220), (290, 1220), (300, 1380), (140, 1380)], smooth=False)
     b.fill(jar, 'teal', pressure=0.95, seed=70); b.outline([(150, 1220), (290, 1220), (300, 1380), (140, 1380)], 4, smooth=False, seed=71)
@@ -77,9 +57,6 @@ def c_bowl():
     b.block((40, 50, 1040, 1870), 'powder', rough=10, corner=30, seed=11)
     b.fill(b.ellipse(540, 900, 520, 520), 'mist', pressure=0.6, slip=0, edge=40, dry_edge=0.9, seed=12)
     table(b, 1330)
-    cr = crack_paths(540, 760, 760, 520, seed=5, n=4)
-    bowl(b, 540, 760, 760, 520, cracks=cr, seed=90)
-    CR['c'] = cr
     b.speckle((60, 60, 1020, 1860), 'chalk', n=700, size=(0.5, 1.3), seed=91)
     finish(b, os.path.join(ART, 'c_bowl.jpg'))
 
@@ -114,9 +91,7 @@ def d_train():
         hx, hy = p_.arms[0][-1]
         b.fill(b.poly([(hx - 22, hy - 40), (hx + 22, hy - 40), (hx + 22, hy + 30), (hx - 22, hy + 30)], smooth=False), INK, pressure=0.95, slip=0, medium='gouache', seed=int(hx))
     people_phase(figs, 'dark'); people_phase(figs, 'accents')
-    hc = heart_cracks(560, 1180, 1.0, seed=7)
-    for p in hc: b.ink(p, 3.4, colour='chalk', dry=0.1, seed=int(p[-1][0]))
-    CR['d'] = hc
+    np.savez_compressed(os.path.join(ART, 'coat_d.npz'), coat=(f.S['body'] * (1 - np.maximum.reduce(f.S['arms']))).astype(np.float16), heart=np.array([560, 1180]))
     b.speckle((60, 60, 1020, 1860), 'chalk', n=600, size=(0.5, 1.3), seed=14)
     finish(b, os.path.join(ART, 'd_train.jpg'))
 
@@ -139,9 +114,7 @@ def e_night():
     f.ink(); f.dark(); f.accents()
     b.rain(win, n=160, angle=82, length=(10, 26), width=(1.6, 2.4), colour='chalk', seed=18)
     b.fill(b.ellipse(860, 300, 30, 30), 'butter', pressure=0.8, slip=0, seed=19)          # the moon
-    hc = heart_cracks(540, 1280, 1.1, seed=8)
-    for p in hc: b.ink(p, 3.6, colour='chalk', dry=0.1, seed=int(p[-1][0]))
-    CR['e'] = hc
+    np.savez_compressed(os.path.join(ART, 'coat_e.npz'), coat=(f.S['body'] * (1 - np.maximum.reduce(f.S['arms']))).astype(np.float16), heart=np.array([540, 1280]))
     b.speckle((60, 60, 1020, 1860), 'chalk', n=500, size=(0.5, 1.3), seed=20)
     finish(b, os.path.join(ART, 'e_night.jpg'))
 
@@ -200,12 +173,7 @@ def h_dawn():
     b.outline([(620, 200), (1000, 200), (1000, 760), (620, 760)], 4.4, smooth=False, seed=15)
     b.ink([(810, 200), (810, 760)], 4, seed=16)
     f.ink(); f.dark(); f.accents()
-    cr = crack_paths(720, 1220, 300, 190, seed=9, n=2)
-    bowl(b, 720, 1220, 300, 190, cracks=cr, seed=110)
-    CR['h_bowl'] = cr
-    hc = heart_cracks(400, 1180, 1.0, seed=9)
-    for p in hc: b.ink(p, 3.2, colour='chalk', dry=0.1, seed=int(p[-1][0]))
-    CR['h'] = hc
+    np.savez_compressed(os.path.join(ART, 'coat_h.npz'), coat=(f.S['body'] * (1 - np.maximum.reduce(f.S['arms']))).astype(np.float16), heart=np.array([400, 1180]))
     b.speckle((60, 60, 1020, 1860), 'chalk', n=600, size=(0.5, 1.3), seed=17)
     finish(b, os.path.join(ART, 'h_dawn.jpg'))
 
@@ -214,9 +182,6 @@ def i_end():
     b = page(2109)
     b.block((40, 50, 1040, 1870), 'powder', rough=10, corner=30, seed=11)
     b.fill(b.ellipse(540, 1300, 460, 420), 'mist', pressure=0.6, slip=0, edge=40, dry_edge=0.9, seed=12)
-    cr = crack_paths(540, 1160, 560, 380, seed=5, n=4)
-    bowl(b, 540, 1160, 560, 380, cracks=cr, seed=120)
-    CR['i'] = cr
     b.speckle((60, 60, 1020, 1860), 'chalk', n=600, size=(0.5, 1.3), seed=13)
     finish(b, os.path.join(ART, 'i_end.jpg'))
 
