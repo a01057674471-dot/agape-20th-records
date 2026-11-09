@@ -24,7 +24,8 @@ class Shot:
         return int(self.r.integers(1 << 30))
 
     def save(self, name):
-        self.p.save(os.path.join(ART, name + '.jpg'), stages_dir=self.stages)
+        import pcommon as _pc
+        self.p.save(os.path.join(_pc.ART, name + '.jpg'), stages_dir=self.stages)
 
 
 def curve(pts, n):
@@ -107,7 +108,7 @@ def rice_bowl(S, cx, cy, rw, steam=True, bowl=('cream', 'powder', 'cornflower', 
 
 
 def person(S, x, y, R, coat=('peach', 'coral', 'terracotta', 'brick'), hair=('hair_light', 'hair', 'umber'),
-           hair_style='bob', eyes_closed=False, look=(0.0, 0.0), smile=True, arms=None, plan=False, grey=False, field=80, cut=None, hands=True):
+           hair_style='bob', eyes_closed=False, look=(0.0, 0.0), smile=True, arms=None, plan=False, grey=False, field=80, cut=None, hands=True, cut_head=False):
     """a storybook adult/child: round head (radius R) at (x, y), soft coat body below. Returns masks."""
     p = S.p
     head = p.ellipse(x, y, R * 0.9, R)
@@ -127,6 +128,8 @@ def person(S, x, y, R, coat=('peach', 'coral', 'terracotta', 'brick'), hair=('ha
         armm = np.maximum(armm, p.tube(a, R * 0.36, R * 0.3))
     if cut is not None:
         body = body * (1 - cut); armm = armm * (1 - cut)
+        if cut_head:
+            head = head * (1 - cut); neck = neck * (1 - cut); hm = hm * (1 - cut)
     mask = np.clip(head + neck + body + hm + armm, 0, 1)
     if plan: return dict(mask=mask, head=head, body=body)
     p.form(body, coat, field, LIGHT, length=(18, 40), density=1.3, warm='butter', cool='lavender', seed=S.sd())
