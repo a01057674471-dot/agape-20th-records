@@ -117,6 +117,11 @@ def person(S, x, y, R, coat=('peach', 'coral', 'terracotta', 'brick'), hair=('ha
                          (x + R * 1.45, y + R * 3.6), (x + R * 1.15, y + R * 1.45), (x + R * 0.5, y + R * 0.95)], 60), smooth=True)
     if hair_style == 'bob':
         hm = p.ellipse(x, y - R * 0.18, R * 1.02, R * 0.98) * (1 - p.ellipse(x, y + R * 0.38, R * 0.8, R * 0.78) * (p.YY > y - R * 0.3))
+    elif hair_style == 'long':                          # a bob that carries on down to the shoulders at the sides
+        top = p.ellipse(x, y - R * 0.18, R * 1.02, R * 0.98) * (1 - p.ellipse(x, y + R * 0.38, R * 0.8, R * 0.78) * (p.YY > y - R * 0.3))
+        side = p.blob(x, y + R * 0.55, R * 1.08, R * 1.15, 0.05) * (p.YY < y + R * 1.55)
+        side = side * np.maximum((np.abs(p.XX - x) > R * 0.66).astype(np.float32), (p.YY < y - R * 0.2).astype(np.float32))
+        hm = np.maximum(top, side)
     elif hair_style == 'short':
         hm = p.ellipse(x, y - R * 0.3, R * 0.96, R * 0.82) * (p.YY < y - R * 0.15)
     elif hair_style == 'bun':
