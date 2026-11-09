@@ -46,9 +46,9 @@ def verse():
     im = layer(); d = ImageDraw.Draw(im)
     d.rounded_rectangle((110, 260, 970, 760), 44, fill=CREAM + (236,))
     d.text((540, 350), '聖書のことば', font=F(700, 38), fill=(170, 130, 90), anchor='mm')
-    d.text((540, 480), 'すべての良い贈り物は、', font=F(900, 64), fill=BROWN, anchor='mm')
-    d.text((540, 580), '上から来る。', font=F(900, 64), fill=BROWN, anchor='mm')
-    d.text((540, 690), 'ヤコブの手紙 1章17節', font=F(700, 38), fill=WARM, anchor='mm')
+    d.text((540, 480), '良いものはすべて、', font=F(900, 66), fill=BROWN, anchor='mm')
+    d.text((540, 580), '天から贈られてくる。', font=F(900, 66), fill=BROWN, anchor='mm')
+    d.text((540, 690), 'ヤコブの手紙 1章17節より', font=F(700, 38), fill=WARM, anchor='mm')
     return im
 
 
@@ -59,10 +59,16 @@ def view(im, z, cx, cy):
     return im.transform((W, H), Image.EXTENT, (x0, y0, x0 + cw, y0 + ch), Image.BICUBIC)
 
 
-SPLIT = {1: ['私たちは毎日、たくさんの', '「ありがとう」を口にします。'], 3: ['自分の力だけで', '生きているんじゃないと、'],
-         6: ['お米を実らせてくれた、', 'お日さまや雨。'], 8: ['その「ありがとう」は、', '誰に届いているんだろう。'],
-         10: None, 11: ['空も、雨も、今日のごはんも、', 'あなたのいのちも。'], 14: ['だから人は、', '「ありがとう」と応えるのです。'],
-         15: ['感謝は、神さまとの関係の、', 'はじまりなんです。'], 0: ['いただきます。', 'ごちそうさま。おかげさまで。']}
+SPLIT = {2: ['いただきます。', 'ごちそうさま。おかげさまで。'],
+         3: ['気づけば私たち、毎日たくさん', '「ありがとう」を言ってるんですよね。'],
+         4: ['それって、すごく素敵なことだと', '思うんです。'],
+         5: ['自分一人の力で', '生きてるわけじゃないって、'],
+         8: ['お米を育ててくれたお日さまや雨に', '「ありがとう」って言うとき、'],
+         9: ['その「ありがとう」って、', 'どこに届いてるんだろうって。'],
+         11: None,
+         15: ['しかもその方は、私たちが', '気づくずっと前から、'],
+         17: ['だから「ありがとう」は、その方への', '一番自然なお返事なんです。'],
+         18: ['あなたの「いただきます」にも、', 'ちゃんと届け先があるんです。']}
 
 
 def main():
@@ -73,33 +79,31 @@ def main():
     al = json.load(open(os.path.join(HERE, 'audio', 'align.json')))
     seg0 = [0.0] + [s[1] for s in al['segs'][:-1]] + [al['total']]
     L = lambda i: seg0[i]
-    # the 4-cut run on line 11, split by the words' lengths
-    a11, e11 = L(11), L(12)
-    w = np.cumsum([0, 3, 3, 8, 8]) / 22.0
-    run = [a11 + (e11 - a11) * x for x in w]
+    # 「空も、雨も、今日のご飯も」: three quick cuts on the words (Whisper: 空 35.08, 雨 36.02, 今日 36.64)
+    a11, e11 = L(12), L(13)
+    sora, ame, kyou = a11, 35.95, 36.56
     # (t0, t1, image, zoom0, zoom1, cx, cy)
     shots = [
-        (0.0, L(1), 'hands', 1.0, 1.04, 0.5, 0.55),
-        (L(1), L(1) + (L(2) - L(1)) * 0.5, 'shrine', 1.0, 1.03, 0.5, 0.5),
-        (L(1) + (L(2) - L(1)) * 0.5, L(2), 'omamori', 1.0, 1.04, 0.5, 0.45),
-        (L(2), L(5), 'family', 1.0, 1.05, 0.48, 0.55),
-        (L(5), L(7), 'paddy', 1.0, 1.03, 0.5, 0.5),
-        (L(7), L(9), 'rice', 1.0, 1.04, 0.5, 0.5),
-        (L(9), L(11), 'bible', 1.0, 1.04, 0.5, 0.65),
-        (run[0], run[1], 'sunrise', 1.25, 1.28, 0.5, 0.2),          # 空も
-        (run[1], run[2], 'paddy', 1.3, 1.33, 0.5, 0.55),            # 雨も
-        (run[2], run[3], 'hands', 1.45, 1.48, 0.32, 0.77),          # 今日のごはんも
-        (run[3], run[4], 'family', 1.45, 1.48, 0.72, 0.5),          # あなたのいのちも
-        (L(12), L(13), 'sunrise', 1.0, 1.03, 0.5, 0.5),
-        (L(13), seg0[-1], 'window', 1.0, 1.05, 0.5, 0.5),
-        (seg0[-1], TOTAL, 'hands', 1.04, 1.07, 0.5, 0.52),
+        (0.0, L(2), 'hands', 1.0, 1.04, 0.5, 0.55),                 # 毎日言ってる「いただきます」…
+        (L(2), L(3), 'shrine', 1.0, 1.03, 0.5, 0.5),                # いただきます。ごちそうさま。おかげさまで。
+        (L(3), L(4), 'omamori', 1.0, 1.04, 0.5, 0.45),              # 毎日たくさん「ありがとう」
+        (L(4), L(7), 'family', 1.0, 1.05, 0.48, 0.55),              # 素敵なこと / 一人の力じゃない
+        (L(7), 24.0, 'paddy', 1.0, 1.03, 0.5, 0.5),                 # でも、ふと… お米を育ててくれた
+        (24.0, L(10), 'rice', 1.0, 1.04, 0.5, 0.5),                 # お日さまや雨に… どこに届いてるんだろう
+        (L(10), L(12), 'bible', 1.0, 1.04, 0.5, 0.65),              # 聖書には… 天から贈られてくる
+        (sora, ame, 'sunrise', 1.25, 1.28, 0.5, 0.2),               # 空も
+        (ame, kyou, 'paddy', 1.3, 1.33, 0.5, 0.55),                 # 雨も
+        (kyou, e11, 'hands', 1.45, 1.48, 0.32, 0.77),               # 今日のご飯も
+        (L(13), L(14), 'family', 1.4, 1.45, 0.72, 0.5),             # そして、あなたの命も
+        (L(14), L(15), 'sunrise', 1.0, 1.03, 0.5, 0.5),             # ちゃんと、贈り主がいる
+        (L(15), L(18), 'window', 1.0, 1.05, 0.5, 0.5),              # 先に愛してくれていた / 自然なお返事
+        (L(18), TOTAL, 'hands', 1.0, 1.06, 0.5, 0.53),              # あなたの「いただきます」にも
     ]
     imgs = {n: Image.open(os.path.join(ART, n + '.jpg')).convert('RGB') for n in set(s[2] for s in shots)}
     subs = {i: sub_layer(SPLIT.get(i) or [LINES[i]]) for i in range(len(LINES)) if SPLIT.get(i, 1) is not None}
-    caps = [(0.0, L(1) - 0.2, caption(['日本人は、毎日', '"誰か"に感謝している。'], 300, 70, accent=(1,))),
-            (L(10), L(11), verse()),
-            (seg0[-1] + 0.2, TOTAL, caption(['あなたの"いただきます"には、', '宛先がある。'], 300, 64, accent=(1,))),
-            (seg0[-1] + 2.0, TOTAL, caption(['今日、何に"ありがとう"と', '言いましたか？'], 1440, 54, box=True))]
+    caps = [(0.0, L(2) - 0.2, caption(['日本人は、毎日', '"誰か"に感謝している。'], 300, 70, accent=(1,))),
+            (L(11), L(12), verse()),
+            (seg0[-1] + 0.2, TOTAL, caption(['今日、何に"ありがとう"と', '言いましたか？'], 300, 64, accent=(0,)))]
     XF_SOFT, XF_QUICK = 0.5, 0.12
 
     def pic(s, t):
@@ -122,7 +126,7 @@ def main():
         k = max(i for i, s in enumerate(shots) if s[0] <= t + 1e-6)
         s = shots[k]
         im = pic(s, t)
-        xf = XF_QUICK if (a11 - 0.01 <= s[0] < e11 - 0.01 and k > 0) else XF_SOFT
+        xf = XF_QUICK if (a11 + 0.01 <= s[0] < e11 - 0.01 and k > 0) else XF_SOFT
         if k > 0 and t - s[0] < xf:
             im = Image.blend(pic(shots[k - 1], t), im, smooth((t - s[0]) / xf))
         im = im.convert('RGBA')
