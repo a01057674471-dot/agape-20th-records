@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>영상 피드백</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%23ff5a36'/><path d='M12 9l11 7-11 7z' fill='white'/></svg>">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <!-- 홈: 프로젝트 목록 -->
+  <section id="home" hidden>
+    <header class="topbar">
+      <div class="brand"><span class="logo">▶</span> 영상 피드백</div>
+      <button class="btn primary" id="newProject">+ 새 프로젝트</button>
+    </header>
+    <main class="home-main">
+      <div class="dropzone" id="homeDrop">
+        <strong>영상을 여기에 끌어다 놓으세요</strong>
+        <span>파일 이름으로 프로젝트가 만들어집니다 · 또는 Claude가 렌더하면 자동으로 올라옵니다</span>
+      </div>
+      <div class="grid" id="projectGrid"></div>
+      <details class="howto">
+        <summary>Claude와 함께 쓰는 법</summary>
+        <ol>
+          <li>Claude가 영상을 렌더하면 <code>node video-feedback/cli.mjs upload &lt;프로젝트&gt; out.mp4</code> 로 올립니다 (또는 <code>video-feedback/inbox/</code> 폴더에 넣기).</li>
+          <li>고칠 장면에서 멈추고 <b>화면을 클릭</b>해 주석을 남깁니다.</li>
+          <li>Claude에게 “피드백 반영해줘”라고 하면 주석(시간·위치·스냅샷)을 읽고 수정한 새 버전을 올립니다.</li>
+          <li><b>체크리스트</b> 탭에서 모든 수정이 반영됐는지 확인하고 완료 처리합니다.</li>
+        </ol>
+      </details>
+    </main>
+  </section>
+
+  <!-- 프로젝트 화면 -->
+  <section id="project" hidden>
+    <header class="topbar">
+      <button class="icon-btn" id="back" title="목록으로">←</button>
+      <div class="title" id="projTitle"></div>
+      <select id="versionSel" title="버전"></select>
+      <span class="ver-note" id="verNote"></span>
+      <div class="spacer"></div>
+      <div class="progress-pill" id="progressPill"></div>
+      <label class="btn" title="새 버전 직접 올리기">⤒ 새 버전<input type="file" id="uploadInput" accept="video/*" hidden></label>
+    </header>
+
+    <div class="workspace">
+      <div class="stage-col">
+        <div class="stage" id="stage">
+          <div class="frame" id="frame">
+            <video id="video" playsinline preload="auto" crossorigin="anonymous"></video>
+            <div class="sub-layer" id="subLayer"></div>
+            <div class="pin-layer" id="pinLayer"></div>
+            <div class="hint" id="clickHint">일시정지 후 화면을 클릭하면 주석을 남길 수 있어요</div>
+          </div>
+          <div class="empty-stage" id="emptyStage" hidden>아직 영상이 없습니다. 영상을 끌어다 놓거나 Claude에게 렌더를 요청하세요.</div>
+        </div>
+
+        <div class="controls">
+          <button class="icon-btn" id="playBtn" title="재생/정지 (Space)">▶</button>
+          <button class="icon-btn" id="prevFrame" title="이전 프레임 (←)">⏮</button>
+          <button class="icon-btn" id="nextFrame" title="다음 프레임 (→)">⏭</button>
+          <span class="time" id="timeLabel">00:00.00 / 00:00.00</span>
+          <div class="spacer"></div>
+          <select id="rateSel" title="재생 속도">
+            <option value="0.25">0.25×</option><option value="0.5">0.5×</option>
+            <option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option>
+          </select>
+          <button class="icon-btn" id="muteBtn" title="음소거">🔊</button>
+        </div>
+        <div class="timeline" id="timeline">
+          <div class="lane ann-lane" id="annLane"></div>
+          <div class="lane sub-lane" id="subLane"></div>
+          <div class="track"><div class="played" id="played"></div></div>
+          <div class="playhead" id="playhead"></div>
+        </div>
+      </div>
+
+      <aside class="side">
+        <nav class="tabs">
+          <button data-tab="notes" class="active">주석 <span class="count" id="tabCountNotes"></span></button>
+          <button data-tab="edit">편집</button>
+          <button data-tab="check">체크리스트 <span class="count" id="tabCountCheck"></span></button>
+        </nav>
+
+        <div class="tab-body" data-body="notes">
+          <div class="filters">
+            <select id="noteScope">
+              <option value="all">모든 버전의 주석</option>
+              <option value="version">이 버전에 남긴 것만</option>
+            </select>
+            <select id="noteStatus">
+              <option value="all">모든 상태</option>
+              <option value="open">미해결</option>
+              <option value="fixed">확인 대기</option>
+              <option value="done">완료</option>
+            </select>
+          </div>
+          <div class="list" id="noteList"></div>
+        </div>
+
+        <div class="tab-body" data-body="edit" hidden>
+          <div class="edit-section">
+            <div class="row between"><h3>🔊 소리 크기</h3><span class="save-state" id="saveState"></span></div>
+            <div class="row">
+              <input type="range" id="volRange" min="0" max="300" step="5" value="100">
+              <input type="number" id="volNum" min="0" max="300" step="5" value="100"><span>%</span>
+            </div>
+          </div>
+          <div class="edit-section">
+            <div class="row between">
+              <h3>💬 자막</h3>
+              <button class="btn small primary" id="addSub">+ 현재 위치에 추가</button>
+            </div>
+            <p class="muted small">영상 위 자막을 끌어서 위치를 옮길 수 있어요. 변경은 자동 저장되고 Claude가 다음 렌더에 반영합니다.</p>
+            <div class="list" id="subList"></div>
+          </div>
+        </div>
+
+        <div class="tab-body" data-body="check" hidden>
+          <div class="check-head">
+            <div class="big-progress" id="checkBar"></div>
+            <div class="check-stats" id="checkStats"></div>
+            <button class="btn small" id="confirmAll" hidden>확인 대기 전부 완료 처리</button>
+          </div>
+          <div class="list" id="checkList"></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 주석 입력 팝업 -->
+  <div class="composer" id="composer" hidden>
+    <div class="composer-meta" id="composerMeta"></div>
+    <textarea id="composerText" rows="3" placeholder="무엇을 고칠까요? (Enter 저장 · Shift+Enter 줄바꿈 · Esc 취소)"></textarea>
+    <div class="row end">
+      <button class="btn small" id="composerCancel">취소</button>
+      <button class="btn small primary" id="composerSave">주석 남기기</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+  <div class="drop-overlay" id="dropOverlay" hidden>놓으면 새 버전으로 올라갑니다</div>
+
+  <script type="module" src="/app.js"></script>
+</body>
+</html>
