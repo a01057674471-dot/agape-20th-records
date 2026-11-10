@@ -1,13 +1,14 @@
-"""Instrumental BGM for the reel: "Amazing Grace" (New Britain, public domain) arranged for soft piano + warm pad,
-synthesised here from scratch (no samples, no recordings). 3/4, G major, 2-bar intro, the tune once, 2-bar ending,
+"""Instrumental BGM for the reel: the hymn "Joyful, Joyful, We Adore Thee" (HYMN TO JOY, Beethoven; public domain) --
+"field and forest, vale and mountain ... flashing sea" praising their Maker -- arranged for soft piano + warm pad and
+synthesised here from scratch (no samples, no recordings). 4/4, D major, 1-bar intro, the tune once, a held last chord,
 fitted to the video length.  python3 bgm.py seconds -> audio/bgm.wav (48 kHz stereo)"""
 import sys, wave
 import numpy as np
 
 SR = 48000
 TOTAL = float(sys.argv[1]) if len(sys.argv) > 1 else 55.2
-BARS = 20
-BEAT = TOTAL / (BARS * 3 + 0.0)             # seconds per beat (~65 bpm)
+BARS = 18
+BEAT = TOTAL / (BARS * 4 + 0.0)             # seconds per beat (~78 bpm)
 N = int(TOTAL * SR) + SR * 2
 L = np.zeros(N); R = np.zeros(N)
 rng = np.random.default_rng(8)
@@ -42,42 +43,46 @@ def pad(ms, t0, dur, vel):
             i = int(t0 * SR); j = min(N, i + n)
             (L if side < 0 else R)[i:j] += y[:j - i] * vel * 0.5
 
-# the tune, (note, beats); bar lines implied (pickup D4 on beat 3 of intro bar 2)
-TUNE = [('D4', 1),
-        ('G4', 2), ('B4', .5), ('G4', .5), ('B4', 2), ('A4', 1), ('G4', 2), ('E4', 1), ('D4', 2), ('D4', 1),
-        ('G4', 2), ('B4', .5), ('G4', .5), ('B4', 2), ('A4', 1), ('D5', 5), ('B4', 1),
-        ('D5', 2), ('B4', .5), ('D5', .5), ('B4', 2), ('A4', 1), ('G4', 2), ('E4', 1), ('D4', 2), ('D4', 1),
-        ('G4', 2), ('B4', .5), ('G4', .5), ('B4', 2), ('A4', 1), ('G4', 6)]
-CH = {'G': ['G2', 'D3', 'B3'], 'C': ['C3', 'G3', 'E4'], 'D': ['D3', 'A3', 'F#4'], 'Em': ['E2', 'B2', 'G3'], 'D7': ['D3', 'A3', 'C4']}
-PADV = {'G': ['G3', 'B3', 'D4'], 'C': ['G3', 'C4', 'E4'], 'D': ['F#3', 'A3', 'D4'], 'Em': ['G3', 'B3', 'E4'], 'D7': ['F#3', 'A3', 'C4']}
-# chords per bar: intro 2, tune 16, ending 2
-BARCH = ['G', 'C'] + ['G', 'G', 'C', 'G', 'G', 'G', 'D', 'D7', 'G', 'G', 'C', 'G', 'Em', 'D', 'G', 'G'] + ['C', 'G']
-
-beat = 0.0
-t_bar = lambda b: b * 3 * BEAT
-# left hand: gentle broken chord (root on 1, fifth & tenth on the "and"s)
-for b, c in enumerate(BARCH):
-    r, f5, t10 = [mid(x) for x in CH[c]]
-    last = b == len(BARCH) - 1
-    vv = 0.42 if b < 2 or b >= 18 else 0.34
-    piano(r, t_bar(b), 3 * BEAT, vv * 1.1, -0.3)
-    if not last:
-        for k, m in enumerate((f5, t10, f5 + 12 if c != 'Em' else t10 + 5, t10)):
-            piano(m, t_bar(b) + (1 + k * 0.5) * BEAT, 1.4 * BEAT, vv * 0.7, -0.15)
-    else:
-        for k, m in enumerate((f5, t10, r + 24)):
-            piano(m, t_bar(b) + k * 0.18, 4 * BEAT, vv * 0.8, -0.1)
-    pad([mid(x) for x in PADV[c]], t_bar(b), 3 * BEAT + (2 * BEAT if last else 0), 0.05)
-# intro: a few high notes over the first two bars
-for (n, bt) in (('D5', 0), ('B4', 1), ('G4', 2), ('E5', 3), ('C5', 4)):
-    piano(mid(n), bt * BEAT, 1.5 * BEAT, 0.28, 0.25)
-# melody, softly, an octave up from the hymn book for a music-box warmth
-t = t_bar(2) - BEAT
+# the tune in D (note, beats)
+TUNE = [('F#4', 1), ('F#4', 1), ('G4', 1), ('A4', 1), ('A4', 1), ('G4', 1), ('F#4', 1), ('E4', 1),
+        ('D4', 1), ('D4', 1), ('E4', 1), ('F#4', 1), ('F#4', 1.5), ('E4', .5), ('E4', 2),
+        ('F#4', 1), ('F#4', 1), ('G4', 1), ('A4', 1), ('A4', 1), ('G4', 1), ('F#4', 1), ('E4', 1),
+        ('D4', 1), ('D4', 1), ('E4', 1), ('F#4', 1), ('E4', 1.5), ('D4', .5), ('D4', 2),
+        ('E4', 1), ('E4', 1), ('F#4', 1), ('D4', 1), ('E4', 1), ('F#4', .5), ('G4', .5), ('F#4', 1), ('D4', 1),
+        ('E4', 1), ('F#4', .5), ('G4', .5), ('F#4', 1), ('E4', 1), ('D4', 1), ('E4', 1), ('A3', 2),
+        ('F#4', 1), ('F#4', 1), ('G4', 1), ('A4', 1), ('A4', 1), ('G4', 1), ('F#4', 1), ('E4', 1),
+        ('D4', 1), ('D4', 1), ('E4', 1), ('F#4', 1), ('E4', 1.5), ('D4', .5), ('D4', 4)]
+CH = {'D': ['D2', 'A2', 'F#3'], 'A': ['A1', 'E2', 'C#3'], 'A7': ['A1', 'E2', 'G3'], 'G': ['G1', 'D2', 'B2'],
+      'Bm': ['B1', 'F#2', 'D3'], 'E': ['E2', 'B2', 'G#3']}
+PADV = {'D': ['A3', 'D4', 'F#4'], 'A': ['A3', 'C#4', 'E4'], 'A7': ['G3', 'C#4', 'E4'], 'G': ['G3', 'B3', 'D4'],
+        'Bm': ['F#3', 'B3', 'D4'], 'E': ['G#3', 'B3', 'E4']}
+# chords per half bar: intro 1 bar, tune 16 bars, ending 1 bar
+HALF = (['D', 'G'] +
+        ['D', 'D', 'A', 'A', 'D', 'G', 'A', 'A'] + ['D', 'D', 'A', 'A', 'D', 'G', 'A7', 'D'] +
+        ['A', 'D', 'A', 'D', 'A', 'Bm', 'E', 'A7'] + ['D', 'D', 'A', 'A', 'D', 'G', 'A7', 'D'] + ['D', 'D'])
+H2 = 2 * BEAT
+for h, c in enumerate(HALF):
+    r, f5, t10 = [mid(x) + 12 for x in CH[c]]
+    t0 = h * H2
+    last = h >= len(HALF) - 2
+    vv = 0.4 if h < 2 or last else 0.32
+    if last:
+        if h == len(HALF) - 2:
+            for k, m in enumerate((r, f5, t10, r + 12)):
+                piano(m, t0 + k * 0.16, 5 * BEAT, 0.34, -0.1)
+            pad([mid(x) for x in PADV[c]], t0, 5 * BEAT, 0.05)
+        continue
+    piano(r, t0, H2, vv * 1.1, -0.3)                         # bass, then a soft broken chord on the eighths
+    for k, m in enumerate((f5, t10, f5 + 12)):
+        piano(m, t0 + (0.5 + k * 0.5) * BEAT, 1.2 * BEAT, vv * 0.62, -0.15)
+    pad([mid(x) for x in PADV[c]], t0, H2, 0.045)
+for (n, bt) in (('A5', 0), ('F#5', 1), ('D5', 2), ('B4', 3)):    # intro: a few falling notes
+    piano(mid(n), bt * BEAT, 1.5 * BEAT, 0.26, 0.25)
+t = 4 * BEAT                                                     # melody an octave up: music-box warmth
 for n, d in TUNE:
-    piano(mid(n) + 12, t, d * BEAT, 0.5, 0.2)
+    piano(mid(n) + 12, t, d * BEAT, 0.48, 0.2)
     t += d * BEAT
-# ending: high G
-piano(mid('G5'), t_bar(19), 4 * BEAT, 0.3, 0.25); piano(mid('D6'), t_bar(19) + 0.25, 4 * BEAT, 0.18, 0.3)
+piano(mid('A5'), 17 * 4 * BEAT + 0.3, 4 * BEAT, 0.22, 0.3)
 
 # a simple reverb: decaying noise impulse, convolved per channel (FFT)
 ir_n = int(2.4 * SR); ti = np.arange(ir_n) / SR
