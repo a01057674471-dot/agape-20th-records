@@ -7,3 +7,4 @@ audio/*.f32
 fonts
 __pycache__/
 art_src/__pycache__/
+audio/*.wav
