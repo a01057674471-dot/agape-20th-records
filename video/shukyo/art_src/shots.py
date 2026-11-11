@@ -67,6 +67,9 @@ def bill():
         y = 620 + j * 52
         p.line([(300, y + 2 - j * 0.5), (640 + rr.uniform(-60, 40), y - 2)], 'warmgrey', 3, 0.7, alpha=0.7)
         p.line([(700, y - 3), (810, y - 5)], 'warmgrey', 3, 0.7, alpha=0.7)
+    sm = p.blob(600, 1062, 190, 34, 0.15, seed=9)
+    p.hatch(sm, 8, ['warmgrey', 'stone', 'pebble'], (30, 70), (2.0, 3.0), 2.0, 0.7, opacity=0.6, alpha=0.75, seed=S.sd())
+    p.lift(blur(sm, 6) * 0.5, 'cream', 0.25)
     t = np.linspace(0, 2 * np.pi * 1.05, 70)
     p.line(np.stack([600 + 250 * np.cos(t), 1060 + 70 * np.sin(t)], 1), 'red', 6, 0.9, alpha=0.9)
     pen = p.tube([(880, 1660), (620, 1500)], 14, 12)
@@ -77,7 +80,6 @@ def bill():
     im = Image.open(os.path.join(ARTD, 'bill.jpg')).convert('RGBA'); lay = Image.new('RGBA', im.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
     d.text((560, 440), '請 求 書', font=ImageFont.truetype(FONT.format(900), 76), fill=(70, 55, 45, 235), anchor='mm')
     d.text((560, 975), '合計金額', font=ImageFont.truetype(FONT.format(700), 40), fill=(90, 70, 55, 230), anchor='mm')
-    d.text((600, 1062), '¥ ●,●●●,●●●', font=ImageFont.truetype(FONT.format(900), 50), fill=(60, 45, 40, 240), anchor='mm')
     im.alpha_composite(lay); im.convert('RGB').save(os.path.join(ARTD, 'bill.jpg'), quality=90)
 
 
