@@ -3,6 +3,7 @@
 // 시간은 audio/lines_paced.json (나레이션 녹음을 음성 인식으로 맞춘 줄별 시간, 카드마다 숨 쉴 틈을 넣은 것).
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
 const W = 1080, H = 1920, FONT = '"Noto Sans KR"';
+const NOSUB = new URLSearchParams(location.search).has('nosub');
 const RED = '#FF4D5A', TEAL = '#22C3B4', WHITE = '#FFFFFF', DARK = '#12201F';
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
 const seg = (t, a, b) => clamp((t - a) / (b - a));
@@ -89,7 +90,7 @@ function draw(c, k, t) {
     topShade(c);
     if (bad) { c.fillStyle = `rgba(255,77,90,${.10 * j})`; c.fillRect(0, 0, W, H); }
     titleBlock(c, bad, p.i + 1, bad ? it.xt : it.ot, bad ? it.xr : it.or, lt);
-    mark(c, bad, 870, 1240, 92, seg(lt, .25, .75));
+    mark(c, bad, 880, 1060, 84, seg(lt, .25, .75));
   } else {
     photo(c, 4, 1.06 + .03 * ss(lt / len)); c.fillStyle = 'rgba(10,20,20,.55)'; c.fillRect(0, 0, W, H);
     c.font = `900 84px ${FONT}`; c.textBaseline = 'middle';
@@ -117,7 +118,7 @@ function render(t) {
       const f = Math.max(0, 1 - Math.abs(q - .35) / .35); ctx.fillStyle = `rgba(255,255,255,${.5 * f})`; ctx.fillRect(0, 0, W, H);
     }
   } else draw(ctx, k, t);
-  if (p.kind !== 'end') subtitle(ctx, t);
+  if (p.kind !== 'end' && !NOSUB) subtitle(ctx, t);   // ?nosub=1: captions are laid on later by the caption-motion pass (captions/)
   const f = 1 - ss(seg(t, 0, .2)); if (f > 0) { ctx.fillStyle = `rgba(18,32,31,${f})`; ctx.fillRect(0, 0, W, H); }
 }
 window.render = render;

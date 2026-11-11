@@ -1,0 +1,5 @@
+자막 모션 스킬(caption-motion-seqc)로 얹은 나레이션 자막.
+1) 자막 없는 화면: video.mjs --q nosub=1 → out/video_nosub.mp4, out/mix.wav 와 합쳐 out/base.mp4
+2) node <스킬>/scripts/subs.cjs captions/captions.json → <스킬>/out/captions.mp4
+3) 휴대폰용으로 다시 인코딩 → run-after-reel.mp4
+이 환경에서는 cdn.jsdelivr.net 이 막혀 있어 한글 폰트를 Google Fonts(주아체=Jua, 나눔손글씨 펜=Nanum Pen Script)로 등록한 스킬 사본으로 렌더했어요.
