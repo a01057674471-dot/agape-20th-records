@@ -35,99 +35,36 @@ window.SPEC = {
   "TAG": "font-family:'주아체';font-weight:500;letter-spacing:-0.02em",
   "F0": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F1": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
-  "F2": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
-  "F3": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F2": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F3": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F4": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
   "F5": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F6": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
   "F7": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F8": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
-  "F9": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
-  "F10": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F9": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F10": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F11": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
   "F12": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F13": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
   "F14": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F15": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
-  "F16": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
-  "F17": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F16": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
+  "F17": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F18": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
   "F19": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
   "F20": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
-  "F21": "font-family:'나눔손글씨 펜';font-weight:400;letter-spacing:-0.03em",
-  "F22": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em",
-  "F23": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em"
+  "F21": "font-family:'주아체';font-weight:400;letter-spacing:-0.03em"
  },
  "cards": [
-  {
-   "in": 0.12,
-   "out": 2.27,
-   "items": [
-    {
-     "kind": "text",
-     "id": "L0R0",
-     "font": "F0",
-     "text": "러닝 끝나고 이거 하면,",
-     "align": "center",
-     "cx": 540,
-     "y": 1289,
-     "size": 112,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L0",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0,
-     "fx": "slide",
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    },
-    {
-     "kind": "text",
-     "id": "L0R1",
-     "font": "F1",
-     "text": [
-      {
-       "t": "뛴 거 "
-      },
-      {
-       "t": "손해",
-       "c": "#FF4D5A"
-      },
-      {
-       "t": " 봐요"
-      }
-     ],
-     "align": "center",
-     "cx": 540,
-     "y": 1401,
-     "size": 150,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L0",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0.95,
-     "ext": "#5A0E14",
-     "fx": "pop3d",
-     "speed": 2.2,
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    }
-   ]
-  },
   {
    "in": 2.25,
    "out": 3.31,
    "items": [
     {
      "kind": "text",
-     "id": "L1R0",
-     "font": "F2",
+     "id": "L0R0",
+     "font": "F0",
      "text": "하나,",
      "align": "center",
      "cx": 540,
@@ -135,7 +72,7 @@ window.SPEC = {
      "size": 112,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L1",
+     "stack": "L0",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -148,8 +85,8 @@ window.SPEC = {
     },
     {
      "kind": "text",
-     "id": "L1R1",
-     "font": "F3",
+     "id": "L0R1",
+     "font": "F1",
      "text": [
       {
        "t": "바로 "
@@ -165,7 +102,7 @@ window.SPEC = {
      "size": 140,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L1",
+     "stack": "L0",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -184,8 +121,8 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L2R0",
-     "font": "F4",
+     "id": "L1R0",
+     "font": "F2",
      "text": "어지러울 수 있어요",
      "align": "center",
      "cx": 540,
@@ -193,7 +130,7 @@ window.SPEC = {
      "size": 120,
      "color": "#FF4D5A",
      "maxW": 960,
-     "stack": "L2",
+     "stack": "L1",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -211,9 +148,70 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
+     "id": "L2R0",
+     "font": "F3",
+     "text": "3~5분은",
+     "align": "center",
+     "cx": 540,
+     "y": 1294,
+     "size": 112,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L2",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0,
+     "fx": "slide",
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    },
+    {
+     "kind": "text",
+     "id": "L2R1",
+     "font": "F4",
+     "text": [
+      {
+       "t": "천천히",
+       "c": "#22C3B4",
+       "k": 1
+      },
+      {
+       "t": " 걸어요"
+      }
+     ],
+     "align": "center",
+     "cx": 540,
+     "y": 1406,
+     "size": 140,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L2",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0.45,
+     "fx": "stretch",
+     "speed": 1.476,
+     "str": {
+      "vf": false
+     },
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    }
+   ]
+  },
+  {
+   "in": 6.67,
+   "out": 7.81,
+   "items": [
+    {
+     "kind": "text",
      "id": "L3R0",
      "font": "F5",
-     "text": "3~5분은",
+     "text": "둘,",
      "align": "center",
      "cx": 540,
      "y": 1294,
@@ -236,67 +234,6 @@ window.SPEC = {
      "font": "F6",
      "text": [
       {
-       "t": "천천히",
-       "c": "#22C3B4",
-       "k": 1
-      },
-      {
-       "t": " 걸어요"
-      }
-     ],
-     "align": "center",
-     "cx": 540,
-     "y": 1406,
-     "size": 140,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L3",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0.45,
-     "fx": "stretch",
-     "speed": 1.476,
-     "str": {
-      "vf": false
-     },
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    }
-   ]
-  },
-  {
-   "in": 6.67,
-   "out": 7.81,
-   "items": [
-    {
-     "kind": "text",
-     "id": "L4R0",
-     "font": "F7",
-     "text": "둘,",
-     "align": "center",
-     "cx": 540,
-     "y": 1294,
-     "size": 112,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L4",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0,
-     "fx": "slide",
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    },
-    {
-     "kind": "text",
-     "id": "L4R1",
-     "font": "F8",
-     "text": [
-      {
        "t": "젖은 옷 "
       },
       {
@@ -311,7 +248,7 @@ window.SPEC = {
      "size": 140,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L4",
+     "stack": "L3",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -338,8 +275,8 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L5R0",
-     "font": "F9",
+     "id": "L4R0",
+     "font": "F7",
      "text": "몸이 식고",
      "align": "center",
      "cx": 540,
@@ -347,7 +284,7 @@ window.SPEC = {
      "size": 112,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L5",
+     "stack": "L4",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -359,8 +296,8 @@ window.SPEC = {
     },
     {
      "kind": "text",
-     "id": "L5R1",
-     "font": "F10",
+     "id": "L4R1",
+     "font": "F8",
      "text": [
       {
        "t": "피부 트러블",
@@ -373,7 +310,7 @@ window.SPEC = {
      "size": 140,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L5",
+     "stack": "L4",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -392,8 +329,8 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L6R0",
-     "font": "F11",
+     "id": "L5R0",
+     "font": "F9",
      "text": [
       {
        "t": "바로 "
@@ -410,7 +347,7 @@ window.SPEC = {
      "size": 130,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L6",
+     "stack": "L5",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -429,12 +366,68 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L7R0",
-     "font": "F12",
+     "id": "L6R0",
+     "font": "F10",
      "text": "셋,",
      "align": "center",
      "cx": 540,
      "y": 1302,
+     "size": 112,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L6",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0,
+     "fx": "slide",
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    },
+    {
+     "kind": "text",
+     "id": "L6R1",
+     "font": "F11",
+     "text": [
+      {
+       "t": "뜨거운",
+       "c": "#FF4D5A"
+      },
+      {
+       "t": " 샤워·사우나"
+      }
+     ],
+     "align": "center",
+     "cx": 540,
+     "y": 1414,
+     "size": 124,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L6",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0.3,
+     "fx": "impact",
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    }
+   ]
+  },
+  {
+   "in": 12.97,
+   "out": 15.36,
+   "items": [
+    {
+     "kind": "text",
+     "id": "L7R0",
+     "font": "F12",
+     "text": "숨부터 고르고,",
+     "align": "center",
+     "cx": 540,
+     "y": 1294,
      "size": 112,
      "color": "#FFFFFF",
      "maxW": 960,
@@ -454,25 +447,25 @@ window.SPEC = {
      "font": "F13",
      "text": [
       {
-       "t": "뜨거운",
-       "c": "#FF4D5A"
+       "t": "미지근한 물",
+       "c": "#22C3B4",
+       "k": 1
       },
       {
-       "t": " 샤워·사우나"
+       "t": "로"
       }
      ],
      "align": "center",
      "cx": 540,
-     "y": 1414,
-     "size": 124,
+     "y": 1406,
+     "size": 140,
      "color": "#FFFFFF",
      "maxW": 960,
      "stack": "L7",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
-     "delay": 0.3,
-     "fx": "impact",
+     "delay": 0.75,
      "glow": "rgba(0,0,0,.45)",
      "glowR": 12,
      "shY": 6
@@ -480,17 +473,17 @@ window.SPEC = {
    ]
   },
   {
-   "in": 12.97,
-   "out": 15.36,
+   "in": 15.75,
+   "out": 17.66,
    "items": [
     {
      "kind": "text",
      "id": "L8R0",
      "font": "F14",
-     "text": "숨부터 고르고,",
+     "text": "물 안 마시기, 또는 한 번에",
      "align": "center",
      "cx": 540,
-     "y": 1294,
+     "y": 1289,
      "size": 112,
      "color": "#FFFFFF",
      "maxW": 960,
@@ -508,62 +501,6 @@ window.SPEC = {
      "kind": "text",
      "id": "L8R1",
      "font": "F15",
-     "text": [
-      {
-       "t": "미지근한 물",
-       "c": "#22C3B4",
-       "k": 1
-      },
-      {
-       "t": "로"
-      }
-     ],
-     "align": "center",
-     "cx": 540,
-     "y": 1406,
-     "size": 140,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L8",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0.75,
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    }
-   ]
-  },
-  {
-   "in": 15.75,
-   "out": 17.66,
-   "items": [
-    {
-     "kind": "text",
-     "id": "L9R0",
-     "font": "F16",
-     "text": "물 안 마시기, 또는 한 번에",
-     "align": "center",
-     "cx": 540,
-     "y": 1289,
-     "size": 112,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L9",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0,
-     "fx": "slide",
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    },
-    {
-     "kind": "text",
-     "id": "L9R1",
-     "font": "F17",
      "text": "벌컥 벌컥",
      "align": "center",
      "cx": 540,
@@ -571,7 +508,7 @@ window.SPEC = {
      "size": 150,
      "color": "#FF4D5A",
      "maxW": 960,
-     "stack": "L9",
+     "stack": "L8",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -589,8 +526,8 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L10R0",
-     "font": "F18",
+     "id": "L9R0",
+     "font": "F16",
      "text": [
       {
        "t": "조금씩",
@@ -607,7 +544,7 @@ window.SPEC = {
      "size": 128,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L10",
+     "stack": "L9",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -627,9 +564,58 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
+     "id": "L10R0",
+     "font": "F17",
+     "text": "다섯, 뛰었으니까",
+     "align": "center",
+     "cx": 540,
+     "y": 1294,
+     "size": 112,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L10",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0,
+     "fx": "slide",
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    },
+    {
+     "kind": "text",
+     "id": "L10R1",
+     "font": "F18",
+     "text": "맥주 한 잔?",
+     "align": "center",
+     "cx": 540,
+     "y": 1406,
+     "size": 140,
+     "color": "#FFFFFF",
+     "maxW": 960,
+     "stack": "L10",
+     "gap": 0.37,
+     "gapMin": true,
+     "gapPx": 0,
+     "delay": 0.7,
+     "fx": "tilt",
+     "speed": 2.2,
+     "glow": "rgba(0,0,0,.45)",
+     "glowR": 12,
+     "shY": 6
+    }
+   ]
+  },
+  {
+   "in": 20.9,
+   "out": 22.44,
+   "items": [
+    {
+     "kind": "text",
      "id": "L11R0",
      "font": "F19",
-     "text": "다섯, 뛰었으니까",
+     "text": "수분이 더 빠지고",
      "align": "center",
      "cx": 540,
      "y": 1294,
@@ -650,55 +636,6 @@ window.SPEC = {
      "kind": "text",
      "id": "L11R1",
      "font": "F20",
-     "text": "맥주 한 잔?",
-     "align": "center",
-     "cx": 540,
-     "y": 1406,
-     "size": 140,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L11",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0.7,
-     "fx": "tilt",
-     "speed": 2.2,
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    }
-   ]
-  },
-  {
-   "in": 20.9,
-   "out": 22.44,
-   "items": [
-    {
-     "kind": "text",
-     "id": "L12R0",
-     "font": "F21",
-     "text": "수분이 더 빠지고",
-     "align": "center",
-     "cx": 540,
-     "y": 1294,
-     "size": 112,
-     "color": "#FFFFFF",
-     "maxW": 960,
-     "stack": "L12",
-     "gap": 0.37,
-     "gapMin": true,
-     "gapPx": 0,
-     "delay": 0,
-     "fx": "slide",
-     "glow": "rgba(0,0,0,.45)",
-     "glowR": 12,
-     "shY": 6
-    },
-    {
-     "kind": "text",
-     "id": "L12R1",
-     "font": "F22",
      "text": [
       {
        "t": "회복이 "
@@ -714,7 +651,7 @@ window.SPEC = {
      "size": 140,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L12",
+     "stack": "L11",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -744,8 +681,8 @@ window.SPEC = {
    "items": [
     {
      "kind": "text",
-     "id": "L13R0",
-     "font": "F23",
+     "id": "L12R0",
+     "font": "F21",
      "text": [
       {
        "t": "물과 식사",
@@ -768,7 +705,7 @@ window.SPEC = {
      "size": 136,
      "color": "#FFFFFF",
      "maxW": 960,
-     "stack": "L13",
+     "stack": "L12",
      "gap": 0.37,
      "gapMin": true,
      "gapPx": 0,
@@ -807,7 +744,7 @@ window.SPEC = {
      "y": 0,
      "s": 44,
      "at": 5.12,
-     "ref": "L3R1",
+     "ref": "L2R1",
      "corner": "tr"
     }
    ],
