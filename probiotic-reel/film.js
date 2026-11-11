@@ -1,7 +1,7 @@
 // 「유산균, 먹는다고 다 장에 남을까요?」 — 47초 세로 릴스. 의학 다큐 톤: 장 속 3D 이미지는 크게, 글자는 흰색 + 민트 포인트,
 // 결론의 실천법 3가지는 흰 카드와 번호로 정리. 화면은 사용자 나레이션(audio/narration.mp3)의 실제 시간에 맞췄다.
 const cv = document.getElementById('c'), ctx = cv.getContext('2d');
-const W = 1080, H = 1920, DUR = 47.0;
+const W = 1080, H = 1920, DUR = 52.5;
 const BG = '#1d1014', MINT = '#9BF2B9', WHITE = '#FFF8F5', INK = '#2A1A1D', MUTE = '#B9A6A9', FONT = '"Noto Sans KR"';
 const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x)), lerp = (a, b, t) => a + (b - a) * t;
 const seg = (t, a, b) => clamp((t - a) / (b - a));
@@ -38,6 +38,7 @@ const SC = [
   { t0: 30.65, kind: 'tip', n: 2, title: ['정착보다', '*내 몸의 변화*로 판단'], body: '장에 남지 않아도 효과가 없는 건 아니에요', key: '내 몸 기준', icon: 'body' },
   { t0: 37.2, kind: 'tip', n: 3, title: ['항생제를 먹는다면'], body: '유산균 시작 시점을', key: '의사·약사와 상의', icon: 'rx' },
   { t0: 43.85, kind: 'sum' },
+  { t0: 47.6, kind: 'product' },
 ];
 const IMG = {};
 const sceneAt = t => { let i = 0; while (i + 1 < SC.length && t >= SC[i + 1].t0) i++; return i; };
@@ -181,12 +182,20 @@ function sceneSum(c, s, t) {
   c.fillText('※ 개인의 건강 상태에 따라 다를 수 있으며, 의료 상담을 대신하지 않습니다.', W / 2, 1346);
   c.globalAlpha = 1;
 }
+function sceneProduct(c, s, t) {      // the product page, full frame, with a slow push
+  const lt = t - s.t0, im = IMG[8], z = 1.0 + .035 * ss(lt / (DUR - s.t0));
+  const w = W * z, h = w * im.height / im.width; c.fillStyle = '#e9f1f6'; c.fillRect(0, 0, W, H);
+  c.drawImage(im, W / 2 - w / 2, H / 2 - h / 2, w, h);
+  c.globalAlpha = eo(seg(lt, .6, 1.2)); c.font = `500 24px ${FONT}`; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillStyle = '#5b6b78';
+  c.fillText('※ 영상 속 연구 내용은 본 제품의 효과를 의미하지 않습니다.', W / 2, H - 40); c.globalAlpha = 1;
+}
 function frame(c, i, t) {
   const s = SC[i]; c.fillStyle = BG; c.fillRect(0, 0, W, H);
   if (s.kind === 'img') sceneImg(c, s, t);
   else if (s.kind === 'split') sceneSplit(c, s, t);
   else if (s.kind === 'tip') sceneTip(c, s, t);
-  else sceneSum(c, s, t);
+  else if (s.kind === 'sum') sceneSum(c, s, t);
+  else sceneProduct(c, s, t);
   if (s.head) headline(c, s.head, t, s.t0, s.kind === 'split' ? 250 : 290);
 }
 
@@ -201,7 +210,7 @@ function render(t) {
     const z = .94 + .06 * eo(p); ctx.globalAlpha = ss(p);
     ctx.drawImage(BUF, W / 2 - W * z / 2, H / 2 - H * z / 2, W * z, H * z); ctx.globalAlpha = 1;
   } else frame(ctx, i, t);
-  if (s.kind !== 'sum') subtitle(ctx, t);
+  if (s.kind !== 'sum' && s.kind !== 'product') subtitle(ctx, t);
   const f = 1 - ss(seg(t, 0, .25)); if (f > 0) { ctx.fillStyle = `rgba(29,16,20,${f})`; ctx.fillRect(0, 0, W, H); }
   const e = ss(seg(t, DUR - .5, DUR)); if (e > 0) { ctx.fillStyle = `rgba(29,16,20,${e})`; ctx.fillRect(0, 0, W, H); }
 }
@@ -210,6 +219,7 @@ window.EV = SC.slice(1).map(s => ({ t: s.t0, type: s.kind === 'tip' ? 'card' : '
 (async () => {
   const load = k => new Promise(r => { const im = new Image(); im.onload = () => { IMG[k] = im; r(); }; im.src = `assets/0${k}.png`; });
   await Promise.all([1, 2, 3, 4, 5, 6, 7].map(load));
+  await new Promise(r => { const im = new Image(); im.onload = () => { IMG[8] = im; r(); }; im.src = 'assets/08-product.png'; });
   await Promise.all(['500 36px', '700 44px', '900 76px'].map(f => document.fonts.load(`${f} ${FONT}`, '유산균')));
   window.READY = true;
 })();
