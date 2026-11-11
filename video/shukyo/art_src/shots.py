@@ -76,8 +76,8 @@ def bill():
     S.save('bill')
     im = Image.open(os.path.join(ARTD, 'bill.jpg')).convert('RGBA'); lay = Image.new('RGBA', im.size, (0, 0, 0, 0)); d = ImageDraw.Draw(lay)
     d.text((560, 440), '請 求 書', font=ImageFont.truetype(FONT.format(900), 76), fill=(70, 55, 45, 235), anchor='mm')
-    d.text((330, 1060), '合計', font=ImageFont.truetype(FONT.format(700), 46), fill=(90, 70, 55, 230), anchor='lm')
-    d.text((820, 1060), '¥3,000,000', font=ImageFont.truetype(FONT.format(900), 70), fill=(60, 45, 40, 240), anchor='rm')
+    d.text((560, 975), '合計金額', font=ImageFont.truetype(FONT.format(700), 40), fill=(90, 70, 55, 230), anchor='mm')
+    d.text((600, 1062), '¥ ●,●●●,●●●', font=ImageFont.truetype(FONT.format(900), 50), fill=(60, 45, 40, 240), anchor='mm')
     im.alpha_composite(lay); im.convert('RGB').save(os.path.join(ARTD, 'bill.jpg'), quality=90)
 
 
