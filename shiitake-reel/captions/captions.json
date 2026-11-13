@@ -1,0 +1,242 @@
+{
+ "_설명": "표고버섯 릴스 나레이션 자막(자막 모션 스킬). 26초 뒤 실천법 카드와 제품 장면은 화면 글자가 있어 자막을 넣지 않아요. 한글 폰트: 주아체(Jua) + Noto Sans KR 700, Google Fonts.",
+ "video": "../out/base.mp4",
+ "size": "9:16",
+ "showFx": false,
+ "style": {
+  "font": "주아체",
+  "weight": 400,
+  "size": 124,
+  "subFont": "Noto Sans KR",
+  "color": "#FFFFFF",
+  "accent": "#FFC56B",
+  "accent2": "#7EC8F0",
+  "neg": "#FF8A6B",
+  "chipText": "#2B2118",
+  "glow": "rgba(0,0,0,.6)",
+  "glowR": 12,
+  "shadowY": 6,
+  "maxW": 960,
+  "popExt": "#5A3A12"
+ },
+ "lines": [
+  {
+   "t0": 0.1,
+   "t1": 4.46,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "표고버섯, 4주 동안 매일 먹으면",
+     "fx": "07"
+    },
+    {
+     "text": "*면역세포*는?",
+     "fx": "wave",
+     "size": 140,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 2.0
+    }
+   ]
+  },
+  {
+   "t0": 4.44,
+   "t1": 8.36,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "미국 플로리다대학교 연구팀",
+     "fx": "07"
+    },
+    {
+     "text": "52명",
+     "fx": "38",
+     "size": 150,
+     "font": "주아체",
+     "weight": 400,
+     "tone": "hi",
+     "delay": 2.2,
+     "count": {
+      "from": 0,
+      "to": 52,
+      "dur": 0.5,
+      "suffix": "명",
+      "numFont": "Anton",
+      "numWeight": 400,
+      "sufFont": "주아체",
+      "sufWeight": 400,
+      "sufK": 0.8
+     }
+    }
+   ],
+   "deco": [
+    {
+     "type": "spark",
+     "items": [
+      {
+       "row": 1,
+       "corner": "tr",
+       "s": 40
+      }
+     ],
+     "at": 2.8,
+     "color": "#FFC56B"
+    }
+   ]
+  },
+  {
+   "t0": 8.34,
+   "t1": 12.74,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "말린 표고버섯, 하루",
+     "fx": "07"
+    },
+    {
+     "text": "*5~10g* · 4주 매일",
+     "fx": "22",
+     "size": 120,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 0.5
+    }
+   ]
+  },
+  {
+   "t0": 12.87,
+   "t1": 15.73,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "먹기 전과 후",
+     "fx": "07"
+    },
+    {
+     "text": "*피*와 *침*을 비교",
+     "fx": "18",
+     "size": 124,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 1.1
+    }
+   ]
+  },
+  {
+   "t0": 15.71,
+   "t1": 19.04,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "감마델타 T세포",
+     "fx": "07"
+    },
+    {
+     "text": "*+60%*",
+     "fx": "06",
+     "size": 180,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 2.0,
+     "ext": "#5A3A12"
+    }
+   ]
+  },
+  {
+   "t0": 19.02,
+   "t1": 22.03,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "NKT세포는",
+     "fx": "07"
+    },
+    {
+     "text": "*2배* 더 활발하게",
+     "fx": "impact",
+     "size": 124,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 0.6
+    }
+   ],
+   "deco": [
+    {
+     "type": "spark",
+     "items": [
+      {
+       "row": 1,
+       "corner": "tr",
+       "s": 44
+      }
+     ],
+     "at": 1.0,
+     "color": "#7EC8F0"
+    }
+   ]
+  },
+  {
+   "t0": 22.01,
+   "t1": 23.77,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "침 속 면역 항체는",
+     "fx": "07"
+    },
+    {
+     "text": "*늘고*",
+     "fx": "hop",
+     "size": 150,
+     "font": "주아체",
+     "weight": 400,
+     "tone": "hi2",
+     "delay": 0.9
+    }
+   ]
+  },
+  {
+   "t0": 23.75,
+   "t1": 25.95,
+   "cy": 1430,
+   "rows": [
+    {
+     "font": "Noto Sans KR",
+     "size": 58,
+     "weight": 700,
+     "text": "염증 수치는",
+     "fx": "07"
+    },
+    {
+     "text": "~오히려 줄었죠~",
+     "fx": "droop",
+     "size": 124,
+     "font": "주아체",
+     "weight": 400,
+     "delay": 0.55
+    }
+   ]
+  }
+ ]
+}
