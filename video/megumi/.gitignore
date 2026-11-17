@@ -1,0 +1,10 @@
+art/*.jpg
+art/*.log
+preview/
+*.mp4
+audio/*.mp3
+audio/*.f32
+fonts
+__pycache__/
+art_src/__pycache__/
+audio/*.wav
