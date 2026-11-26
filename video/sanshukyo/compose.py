@@ -147,7 +147,7 @@ def table_layer(t, t0):
         if u <= 0: continue
         A = int(255 * u); xa, xb = xs[k + 1], xs[k + 2]
         cx = (xa + xb) / 2
-        w_ = (xb - xa) * abs(np.cos((1 - u) * np.pi / 2))
+        w_ = max(40.0, (xb - xa) * abs(np.cos((1 - u) * np.pi / 2)))
         d.rounded_rectangle((cx - w_ / 2 + 4, y0, cx + w_ / 2 - 4, y0 + 90 + rh * 3), 26, fill=CREAM + (int(240 * u),), outline=col + (A,), width=4)
         d.rounded_rectangle((cx - w_ / 2 + 4, y0, cx + w_ / 2 - 4, y0 + 90), 26, fill=col + (A,))
         if u > 0.6:
