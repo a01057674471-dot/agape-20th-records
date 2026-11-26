@@ -101,7 +101,7 @@ def view(im, z, cx, cy):
 
 
 SPLIT = {1: ['ニュースでよく聞くけど、', 'なにがちがうか、知っていますか？'],
-         2: ['実はこの3つ、同じひとりの', '人物から始まります。'],
+         2: ['実はこの3つ、同じひとりの人物を、', '"信仰の父"としています。'],
          3: ['約4000年前の人物とされる、', 'アブラハム。'],
          4: ['だから、"アブラハムの宗教"とも', '呼ばれます。'],
          5: ['3つとも、"神様は、ひとり"と', '信じています。'],
@@ -294,7 +294,7 @@ def main():
     L = lambda i: seg0[i]
     TOTAL = seg0[-1] + END_HOLD
     a = lambda t: LEAD + t                                  # audio time -> video time
-    G = a(22.6)
+    G = a(23.85)
     shots = [
         (0.0, L(2), 'phone_news', 1.0, 1.05, 0.5, 0.45),        # ユダヤ教、キリスト教、イスラム教 / なにがちがう?
         (L(2), L(5), 'abraham', 1.0, 1.06, 0.5, 0.5),           # 同じひとりの人物 / アブラハム
@@ -312,11 +312,11 @@ def main():
     FILE = {'graph': 'paper_bg', 'table': 'paper_bg'}
     imgs = {n: Image.open(os.path.join(ART, FILE.get(n, n) + '.jpg')).convert('RGB') for n in set(s[2] for s in shots)}
     for n_ in ('abraham', 'three_roads'):
-        g0 = imgs[n_]; gs = Image.new('RGB', (W, H)); gs.paste(g0.crop((0, 300, W, H)), (0, 0)); gs.paste(g0.crop((0, H - 300, W, H)), (0, H - 300))
+        g0 = imgs[n_]; gs = Image.new('RGB', (W, H)); gs.paste(g0.crop((0, 300, W, H)), (0, 0)); gs.paste(g0.crop((0, 1720, W, H)).resize((W, 300)), (0, H - 300))
         imgs[n_] = gs
     subs = {i: sub_layer(SPLIT.get(i) or [LINES[i]]) for i in range(len(LINES)) if SPLIT.get(i, 1) is not None}
-    POPS = [(word_img('イエスは、だれか？', col=WARM, size=72), 540, 360, a(29.42), L(8)),
-            (word_img('アブラハム', col=WARM, size=72), 540, 360, a(14.82), L(5))]
+    POPS = [(word_img('イエスは、だれか？', col=WARM, size=72), 540, 360, a(30.67), L(8)),
+            (word_img('アブラハム', col=WARM, size=72), 540, 360, a(16.07), L(5))]
     CARDS = []
     caps = [(0.05, L(2), caption(['ユダヤ教・キリスト教・', 'イスラム教、', 'なにがちがう？'], 260, 66, accent=(2,))),
             (L(8), L(12), faith_card(0)), (L(12), L(16), faith_card(1)), (L(16), L(19), faith_card(2)),
