@@ -9,7 +9,8 @@ description: >-
   paper foley, and one assembled MP4. Use whenever the user wants a myth, legend, fable,
   folktale or fairy-tale short, a cut-paper or papercraft animated story, "tell the story
   of X" as a video, a stop-motion-look mythic film, or says "run the cardstock diorama
-  myth animation" or "run the diorama myth pipeline" — even with no story given, since the skill proposes myths itself. NOT for
+  myth animation" or "run the diorama myth pipeline" — even with no story given, since the skill proposes myths itself.
+  The user's shorthand for this skill is "종이" (e.g. "종이로 만들어줘", "종이 스킬", "종이 샘플"): treat it as a request for this skill. NOT for
   fact-driven explainers with charts and statistics (that is vox-motion-graphics).
 ---
 
